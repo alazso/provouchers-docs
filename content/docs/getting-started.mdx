@@ -1,0 +1,66 @@
+---
+title: Getting Started
+description: Install ProVouchers and Strata, then create your first voucher.
+---
+
+ProVouchers depends on the [Strata](https://github.com/alazso/strata) shared
+library, the same install model as Vault or LuckPerms. Strata is installed once
+on the server and ProVouchers loads after it automatically.
+
+## 1. Install Strata
+
+Download `strata-<version>.jar` from the
+[Strata releases](https://github.com/alazso/strata/releases) and drop it into
+`plugins/`. The heavy runtime libraries (Kotlin standard library, JDBC drivers,
+connection pool) are downloaded by Paper's library loader on first start, so you
+install nothing else.
+
+## 2. Install ProVouchers
+
+Download `provouchers-<version>.jar` from the
+[ProVouchers releases](https://github.com/alazso/ProVouchers/releases), drop it
+into `plugins/`, and restart the server. On startup ProVouchers checks that
+Strata is present and refuses to enable without it.
+
+## 3. Create a voucher
+
+Voucher definitions live in `plugins/ProVouchers/vouchers/`. Each file is one
+voucher, keyed by its `id`.
+
+```yaml title="vouchers/starter.yml"
+id: starter
+display-name: "<gradient:#FFD700:#FF4500>Starter Kit</gradient>"
+item:
+  material: PAPER
+  glow: true
+lore:
+  - "<gray>Right-click to claim your starter kit"
+cooldown: 0
+conditions:
+  - type: permission
+    value: "provouchers.use.starter"
+rewards:
+  - "command: give %player% iron_sword 1"
+  - "message: <gold>Welcome! Your starter kit has been delivered."
+```
+
+## 4. Give it out
+
+```text
+/voucher give starter 1 Steve
+```
+
+Reload your voucher files at any time with `/voucher reload`, which reports per
+file validation errors so a typo never fails silently.
+
+## Storage
+
+ProVouchers uses Strata's storage layer for cooldowns, anti-dupe stamps, and the
+offline-give queue. The default backend is file-based SQLite, with MySQL,
+MariaDB, and PostgreSQL available for networks. Configure the backend in
+`config.yml`.
+
+## Next steps
+
+More configuration reference (conditions, rewards, effects, codes, and the
+CrazyVouchers importer) lands as those features ship.
