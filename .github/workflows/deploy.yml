@@ -23,8 +23,8 @@ jobs:
       - id: ver
         name: Resolve ProVouchers version
         run: |
-          STABLE=$(curl -sSL https://api.github.com/repos/alazso/ProVouchers/releases/latest | jq -r '.tag_name // empty' | sed 's/^v//' || true)
-          GRADLE=$(curl -sSL https://raw.githubusercontent.com/alazso/ProVouchers/main/gradle.properties | sed -n 's/^version=//p' | tr -d '[:space:]' || true)
+          STABLE=$(curl -sSL https://api.github.com/repos/alazso/provouchers/releases/latest | jq -r '.tag_name // empty' | sed 's/^v//' || true)
+          GRADLE=$(curl -sSL https://raw.githubusercontent.com/alazso/provouchers/main/gradle.properties | sed -n 's/^version=//p' | tr -d '[:space:]' || true)
           echo "version=${STABLE:-${GRADLE:-0.1.0}}" >> "$GITHUB_OUTPUT"
       - uses: docker/build-push-action@v6
         with:

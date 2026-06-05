@@ -1,6 +1,6 @@
 # ProVouchers Docs
 
-Documentation site for [ProVouchers](https://github.com/alazso/ProVouchers),
+Documentation site for [ProVouchers](https://github.com/alazso/provouchers),
 built with Next.js and Fumadocs. Served at https://alaz.so/provouchers.
 
 ## Development
