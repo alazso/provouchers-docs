@@ -2,6 +2,7 @@
   "title": "ProVouchers",
   "pages": [
     "index",
-    "getting-started"
+    "getting-started",
+    "commands"
   ]
 }

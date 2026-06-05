@@ -1,0 +1,34 @@
+---
+title: Commands and Permissions
+description: The /voucher command tree and its permission nodes.
+---
+
+All commands live under `/voucher`, with the aliases `/pv` and `/vouchers`.
+
+## Commands
+
+| Command | Permission | Description |
+| --- | --- | --- |
+| `/voucher give <id> [amount] [player] [arg]` | `provouchers.give` | Give a voucher to yourself or another player. |
+| `/voucher giveall <id> [amount] [arg]` | `provouchers.giveall` | Give a voucher to every online player. |
+| `/voucher redeem <code> [arg]` | `provouchers.redeem` | Redeem a typeable code. |
+| `/voucher list` | `provouchers.list` | List loaded vouchers and the code count. |
+| `/voucher reload` | `provouchers.reload` | Reload voucher and code files, reporting per-file errors. |
+
+When the target player is omitted on `give`, the voucher goes to the command
+sender. Running `give` from the console requires naming a player.
+
+## Bypass and utility nodes
+
+| Permission | Effect |
+| --- | --- |
+| `provouchers.bypass.cooldown` | Ignore per-voucher redemption cooldowns. |
+| `provouchers.bypass.gamemode` | Redeem in any game mode (creative and spectator are blocked by default). |
+| `provouchers.notify` | Receive a staff alert when a duplicate voucher is detected. |
+
+## Redeeming items
+
+Holding a voucher and right-clicking redeems it. The item is validated against
+its conditions, checked for duplication, consumed, and the rewards are granted.
+Placing a voucher into an item frame is blocked to prevent detaching it from its
+stamp.
