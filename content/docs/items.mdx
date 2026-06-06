@@ -84,13 +84,13 @@ item:
 
 ### Requirements
 
-<Callout type="warn">
-Custom provider items are resolved through Strata's item hooks. For
-`custom: "itemsadder:..."` to render the real item, your server needs **both** the
-provider plugin (ItemsAdder/Oraxen/Nexo) **and** a Strata build that ships the
-matching item hook. If no hook can resolve the reference, the voucher falls back to
-its `material` (default `PAPER`). Check `/voucher reload` and the console if a
-custom item shows up as paper.
+<Callout>
+Custom provider items are resolved through Strata's item hooks. Strata **0.6.2+**
+ships hooks for ItemsAdder, Oraxen, and Nexo, so you only need the provider plugin
+installed and its item to exist. If the reference cannot be resolved (the provider
+plugin is missing, the id is wrong, or Strata is older than 0.6.2), the voucher
+falls back to its `material` (default `PAPER`). If a custom item shows up as paper,
+check the provider plugin is installed and the id is correct.
 </Callout>
 
 This is a deliberate design choice: ProVouchers does not integrate with each

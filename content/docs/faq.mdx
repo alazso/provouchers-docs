@@ -71,10 +71,11 @@ See [Conditions](/docs/conditions).
 
 ### My custom item shows up as plain paper.
 
-`custom: "itemsadder:..."` is resolved through a Strata item hook. If your Strata
-build does not ship that provider's hook, or the provider plugin is not installed,
-the voucher falls back to its `material` (default `PAPER`). See
-[Items](/docs/items#requirements). Vanilla `custom-model-data` similarly needs a
+`custom: "itemsadder:..."` is resolved through a Strata item hook. Strata 0.6.2+
+ships hooks for ItemsAdder, Oraxen, and Nexo, so the usual causes are: the provider
+plugin is not installed, the item id is wrong, or Strata is older than 0.6.2. When
+the reference cannot be resolved, the voucher falls back to its `material` (default
+`PAPER`). See [Items](/docs/items). Vanilla `custom-model-data` separately needs a
 resource pack to show.
 
 ### How do I give an item with a custom texture?

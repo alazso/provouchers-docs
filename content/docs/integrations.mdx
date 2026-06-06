@@ -76,11 +76,11 @@ rewards:
   - "item: oraxen:cool_sword 1"
 ```
 
-<Callout type="warn">
-Custom items require a Strata build that ships the matching item hook for your
-provider (ItemsAdder, Oraxen, Nexo). If no hook resolves the reference, an item
-voucher falls back to its `material` and an item reward is skipped and logged. If a
-custom item shows up as paper, this is why.
+<Callout>
+Strata **0.6.2+** ships item hooks for ItemsAdder, Oraxen, and Nexo, so custom
+items work once the provider plugin is installed and the item exists. If a
+reference cannot be resolved, an item voucher falls back to its `material` and an
+item reward is skipped and logged.
 </Callout>
 
 ## Placeholders
@@ -92,13 +92,17 @@ messages, broadcasts, titles, and action bars. See
 [Text and Placeholders](/docs/text). Install PlaceholderAPI and the placeholders
 you reference, and they render automatically.
 
+**MiniPlaceholders** is also supported (Strata 0.6.2+), for component-based,
+MiniMessage-native placeholders. It resolves in the same text alongside
+PlaceholderAPI.
+
 ## Regions and claims
 
 Used by the [`region` condition](/docs/conditions#region-worldguard-and-claim-plugins).
 
 Region restrictions (claim only in spawn, deny in PvP zones, and so on) work
-through a region hook. Install the supported region or claim plugin and a Strata
-build with the matching hook, then gate vouchers with `type: region`.
+through a region hook. Strata **0.6.2+** ships a WorldGuard provider, so install
+WorldGuard and gate vouchers with `type: region`.
 
 ## Everything else
 
@@ -118,12 +122,14 @@ right tool.
 
 ## Summary
 
+Requires Strata **0.6.2 or newer**.
+
 | Capability | Works via | Status |
 | --- | --- | --- |
 | Economy (give/take, balance check) | Vault | Works now |
 | Permissions (condition) | Bukkit | Works now |
 | Ranks (condition) | LuckPerms | Works now |
-| Placeholders | PlaceholderAPI | Works now |
-| Custom items | Strata item hook | Requires a Strata build with the item hook |
-| Regions (condition) | Strata region hook | Requires a Strata build with the region hook |
+| Placeholders | PlaceholderAPI, MiniPlaceholders | Works now |
+| Custom items | ItemsAdder, Oraxen, Nexo | Works now |
+| Regions (condition) | WorldGuard | Works now |
 | Everything else | `command:` reward | Always available |
