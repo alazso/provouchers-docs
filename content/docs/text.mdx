@@ -1,0 +1,89 @@
+---
+title: Text and Placeholders
+description: MiniMessage formatting, gradients, hex colours, and PlaceholderAPI in voucher text.
+---
+
+Every piece of text in ProVouchers (display names, lore, messages, broadcasts,
+titles, action bars) is rendered with **MiniMessage**, and PlaceholderAPI is
+resolved first when it is installed. This is handled by
+[Strata](https://github.com/alazso/strata)'s text renderer, so the behaviour is
+consistent everywhere.
+
+## MiniMessage basics
+
+MiniMessage uses XML-like tags instead of legacy `&` codes:
+
+```yaml
+display-name: "<gold>Crate Key"
+lore:
+  - "<gray>Right-click to open"
+  - "<red>Limited time only"
+```
+
+Common tags:
+
+| Tag | Effect |
+| --- | --- |
+| `<gold>`, `<red>`, `<gray>` | Named colours |
+| `<#FF8800>` | Any hex colour |
+| `<bold>`, `<italic>`, `<underlined>` | Decorations |
+| `<gradient:#FFD700:#FF4500>text</gradient>` | A colour gradient |
+| `<rainbow>text</rainbow>` | A rainbow |
+| `<hover:show_text:'...'>text</hover>` | Hover tooltip |
+| `<click:run_command:'/spawn'>text</click>` | Clickable text |
+
+```yaml
+display-name: "<gradient:#FFD700:#FF7F50:#FF4500>Stratosphere</gradient>"
+lore:
+  - "<gray>A pair of <#FFD700>golden</#FFD700> wings"
+  - "<italic><dark_gray>Season 1</dark_gray></italic>"
+```
+
+For the full tag list, see the
+[MiniMessage format reference](https://docs.advntr.dev/minimessage/format.html).
+
+## Lore tips
+
+- An empty string is a blank line:
+
+  ```yaml
+  lore:
+    - "<gray>First line"
+    - ""
+    - "<dark_gray>Footer"
+  ```
+
+- Names and lore are shown without the default purple italic styling, so what you
+  write is what players see.
+
+## PlaceholderAPI
+
+When PlaceholderAPI is installed, its placeholders are resolved in any ProVouchers
+text, rendered for the redeeming or viewing player:
+
+```yaml
+lore:
+  - "<gray>Balance: <gold>%vault_eco_balance%"
+rewards:
+  - "message: <green>Welcome back, %player_displayname%!"
+```
+
+### Resolution order matters
+
+PlaceholderAPI placeholders are resolved **first**, then the result is parsed as
+MiniMessage. This order is fixed and deliberate: doing it the other way around
+would let a placeholder's output be reinterpreted as formatting tags. In practice,
+write your MiniMessage as normal and drop `%placeholders%` in wherever you need
+dynamic values.
+
+## ProVouchers tokens vs placeholders
+
+ProVouchers also substitutes a few [tokens](/docs/rewards#tokens) (`%player%`,
+`{arg}`, `{random:min-max}`) before MiniMessage. These are always available, even
+without PlaceholderAPI. Use `%player%` for the player's name in any text or reward.
+
+## When there is no resource pack
+
+Colours, gradients, and decorations are all part of the chat protocol and need no
+resource pack. Only `custom-model-data` and custom provider item models require a
+pack (see [Items](/docs/items)).

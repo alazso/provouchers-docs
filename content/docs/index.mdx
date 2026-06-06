@@ -1,33 +1,37 @@
 ---
 title: Introduction
-description: A feature-rich voucher plugin for Paper and Folia, built on Strata.
+description: A feature-rich voucher and code plugin for Paper and Folia, built on Strata.
 ---
 
 ## What is ProVouchers?
 
-ProVouchers gives server operators item vouchers and typeable codes backed by a
-config-driven reward and condition system. It is the plugin you reach for when
-CrazyVouchers has run out of room: indexed persistent storage instead of a flat
-file scanned on every redeem, anti-dupe protection that survives restarts, loud
-validation of every voucher file, and a migration command to bring your existing
-setup across.
+ProVouchers turns rewards into items players can hold and codes players can type.
+A **voucher** is a configurable item (right-click to redeem). A **code** is a word
+players enter with `/voucher redeem`. Both run the same rewards, gate behind the
+same conditions, and are defined in plain YAML files you can copy, paste, and
+reload without restarting.
 
-It builds on [Strata](https://github.com/alazso/strata) for the shared plumbing
-(scheduling, storage, text, hooks, GUIs, and metrics), so the plugin itself
-stays focused on vouchers.
+It is built for servers that have outgrown simpler voucher plugins:
+
+- **Indexed, persistent storage** (SQLite, MySQL, MariaDB, or PostgreSQL) instead
+  of a flat file rescanned on every redeem.
+- **Anti-dupe that survives restarts**, with a per-item stamp checked off-thread.
+- **Loud validation**: a typo in a voucher file is reported by `/voucher reload`
+  with the file and the reason, never silently ignored.
+- **A typed reward and condition system** that reads cleanly for beginners and
+  composes for advanced setups.
+- **Folia-safe** throughout, on Paper or Folia 26.1+.
+
+ProVouchers builds on the [Strata](https://github.com/alazso/strata) shared
+library for scheduling, storage, text rendering, conditions, integrations, GUIs,
+and metrics, so the plugin stays focused on vouchers.
 
 ## Requirements
 
 - Paper or Folia **26.1+** (Java 25)
 - [Strata](https://github.com/alazso/strata) installed on the server
 
-## Installation
-
-1. Download `Strata` and drop it into your server's `plugins/` folder.
-2. Download the latest `provouchers-<version>.jar` from the [GitHub Releases](https://github.com/alazso/provouchers/releases) page.
-3. Drop it into `plugins/` and restart the server.
-
-## A voucher at a glance
+## At a glance
 
 ```yaml title="vouchers/example.yml"
 id: example
@@ -37,14 +41,20 @@ item:
   glow: true
 lore:
   - "<gray>Right-click to redeem"
+cooldown: 0
 conditions:
   - type: permission
     permission: "provouchers.use.example"
 rewards:
-  - "command: give %player% diamond 1"
-  - "message: <gold>You redeemed the example voucher!"
+  - "item: DIAMOND 1"
+  - "currency: give 250"
+  - "message: <green>You redeemed the example voucher!"
 ```
 
-## Next steps
+## Where to go next
 
-- [Getting Started](/docs/getting-started)
+- New here? Start with [Getting Started](/docs/getting-started).
+- Want the mental model? Read [Core Concepts](/docs/concepts).
+- Looking for a specific field? Jump to the [Voucher Reference](/docs/vouchers),
+  [Conditions](/docs/conditions), or [Rewards](/docs/rewards).
+- Something not working? See the [FAQ and Troubleshooting](/docs/faq).

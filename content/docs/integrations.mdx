@@ -1,0 +1,129 @@
+---
+title: Integrations
+description: Which plugins ProVouchers works with, and how it connects to them.
+---
+
+ProVouchers integrates with other plugins through
+[Strata](https://github.com/alazso/strata)'s hooks rather than talking to each
+plugin directly. The benefit: support is by **capability**, so any plugin that
+provides a capability (an economy, a permission system, a custom item) works the
+same way, with no ProVouchers-specific configuration. Install the plugin, and the
+matching feature lights up.
+
+## Economy
+
+Used by the [`economy` condition](/docs/conditions#economy-balance) and the
+[`currency` reward](/docs/rewards#currency).
+
+ProVouchers reads the economy provider registered with **Vault**, so it works with
+any Vault-compatible economy for that provider's currency:
+
+- EssentialsX Economy
+- CMI Economy
+- ExcellentEconomy, CoinsEngine (their Vault-registered currency)
+- PlayerPoints (via its Vault bridge)
+
+```yaml
+rewards:
+  - "currency: give 500"
+conditions:
+  - type: economy
+    amount: 1000
+```
+
+Nothing to configure: install Vault and an economy plugin, and both the reward and
+the condition work.
+
+<Callout>
+Vault's economy interface is single-currency. Multi-currency plugins expose only
+their default currency through Vault, so additional named currencies (tokens, gems)
+are not reachable today.
+</Callout>
+
+## Permissions and ranks
+
+Used by the [`permission`](/docs/conditions#permission) and
+[`rank`](/docs/conditions#rank-luckperms-groups) conditions.
+
+- The `permission` condition works with plain Bukkit permissions, so it functions
+  with any permissions plugin.
+- The `rank` condition needs a group-aware provider; **LuckPerms** is supported and
+  resolves the player's groups.
+
+```yaml
+conditions:
+  - type: permission
+    permission: "provouchers.use.vip"
+  - type: rank
+    groups: [ vip, mvp ]
+```
+
+Granting a rank or permission as a **reward** is best done today with a
+`command:` reward (for example `lp user %player% parent addtemp vip 7d`). Native
+rank-granting rewards are planned.
+
+## Custom items
+
+Used by the [`custom` item field](/docs/items#custom-provider-items-itemsadder-oraxen-nexo)
+and the [`item` reward](/docs/rewards#item).
+
+ProVouchers references custom items as `provider:id` and asks Strata to build them:
+
+```yaml
+item:
+  custom: "itemsadder:ax_wings_pack:phoenix_wings"
+rewards:
+  - "item: oraxen:cool_sword 1"
+```
+
+<Callout type="warn">
+Custom items require a Strata build that ships the matching item hook for your
+provider (ItemsAdder, Oraxen, Nexo). If no hook resolves the reference, an item
+voucher falls back to its `material` and an item reward is skipped and logged. If a
+custom item shows up as paper, this is why.
+</Callout>
+
+## Placeholders
+
+Used everywhere text is rendered.
+
+**PlaceholderAPI** is supported: its placeholders resolve in display names, lore,
+messages, broadcasts, titles, and action bars. See
+[Text and Placeholders](/docs/text). Install PlaceholderAPI and the placeholders
+you reference, and they render automatically.
+
+## Regions and claims
+
+Used by the [`region` condition](/docs/conditions#region-worldguard-and-claim-plugins).
+
+Region restrictions (claim only in spawn, deny in PvP zones, and so on) work
+through a region hook. Install the supported region or claim plugin and a Strata
+build with the matching hook, then gate vouchers with `type: region`.
+
+## Everything else
+
+For plugins ProVouchers does not integrate with natively, a `command:` reward
+covers almost every case:
+
+```yaml
+rewards:
+  - "command: crates give %player% vote 1"     # crate plugins
+  - "command: ae givebook %player% Protection 5 100"   # enchant plugins
+  - "command: kit give %player% starter"        # kits
+```
+
+This is intentional. Native integration is added only where commands are fragile or
+lossy. If `/command %player% ...` does the job cleanly, a command reward is the
+right tool.
+
+## Summary
+
+| Capability | Works via | Status |
+| --- | --- | --- |
+| Economy (give/take, balance check) | Vault | Works now |
+| Permissions (condition) | Bukkit | Works now |
+| Ranks (condition) | LuckPerms | Works now |
+| Placeholders | PlaceholderAPI | Works now |
+| Custom items | Strata item hook | Requires a Strata build with the item hook |
+| Regions (condition) | Strata region hook | Requires a Strata build with the region hook |
+| Everything else | `command:` reward | Always available |

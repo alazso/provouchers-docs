@@ -1,0 +1,75 @@
+---
+title: Anti-Dupe and Anti-Exploit
+description: How ProVouchers stops voucher duplication and common exploits.
+---
+
+Vouchers are items, and items can be duplicated (creative copies, inventory bugs,
+client exploits). ProVouchers stamps each voucher and verifies it against the
+database on redeem, so a copied voucher cannot be redeemed twice.
+
+## How stamping works
+
+Every voucher item carries hidden persistent data:
+
+- A **batch id**, shared by all items handed out in one give operation, written when
+  the item is created.
+- A **nonce**, unique to a single physical item, assigned lazily the first time a
+  player interacts with the item.
+
+The nonce is assigned on first interaction rather than at give time so that a stack
+of vouchers stays stackable until someone actually uses one. When a player redeems,
+the `(batch id, nonce)` pair is checked against the database:
+
+- **Unseen** means valid: the redemption proceeds and the pair is recorded.
+- **Already recorded** means duplicate: the redemption is rejected.
+
+Because a duplicated item shares the same nonce as the original, the second redeem
+always resolves as a duplicate. The check runs off the main thread, so it never
+lags the server.
+
+## Configuration
+
+```yaml title="config.yml"
+anti-dupe:
+  # When a duplicate is detected on redeem, remove the item instead of returning it.
+  remove-on-discovery: true
+```
+
+- `remove-on-discovery: true` (default) destroys a duplicate voucher when it is
+  caught, so it cannot be passed around and tried repeatedly.
+- `remove-on-discovery: false` returns the item to the player and simply refuses to
+  redeem it.
+
+## Staff alerts
+
+Players (usually staff) with the `provouchers.notify` permission receive a chat
+alert when a duplicate is detected, including who attempted it and which voucher.
+
+## Built-in exploit guards
+
+In addition to stamping, ProVouchers blocks a few common abuse vectors:
+
+| Guard | Behaviour | Override |
+| --- | --- | --- |
+| Game-mode gate | Creative and spectator cannot redeem | `provouchers.bypass.gamemode` |
+| Item frames | Placing a voucher in an item frame is blocked | (none) |
+| Inventory clones | A cloned item shares its nonce, so the copy resolves as a duplicate | (inherent) |
+
+The game-mode gate matters because creative lets players middle-click to clone
+items freely. Blocking redemption in creative, combined with the nonce check,
+removes the easy duplication path.
+
+## Networked anti-dupe
+
+If you run several servers, point them all at the same MySQL, MariaDB, or
+PostgreSQL database (see [Storage](/docs/storage)). The stamp records are then
+shared, so a voucher redeemed on one server cannot be redeemed again on another.
+
+## Limits to be aware of
+
+- The strongest protection requires a give time and a nonce, both of which are
+  stamped by ProVouchers when it creates the item. Items spawned by other means
+  (for example a raw `/give` of a look-alike) are not ProVouchers vouchers and are
+  ignored.
+- Anti-dupe protects redemption, not the economy your rewards grant. Pair it with
+  sensible cooldowns and use limits.

@@ -1,0 +1,96 @@
+---
+title: Core Concepts
+description: Vouchers vs codes, where everything is configured, and how a redemption flows.
+---
+
+A quick mental model so the rest of the documentation clicks into place.
+
+## Vouchers and codes
+
+ProVouchers has two delivery methods that share everything else:
+
+| | Voucher | Code |
+| --- | --- | --- |
+| What it is | A physical item players hold | A word players type |
+| How it is redeemed | Right-click the item | `/voucher redeem <code>` |
+| Defined in | `vouchers/<id>.yml` | `codes/<id>.yml` |
+| Use limit | Per item (each item redeems once) | Per player and/or global counter |
+| Rewards, conditions, effects | Same system | Same system |
+
+If you understand one, you understand the other. The fields that differ are listed
+on the [Voucher Reference](/docs/vouchers) and [Code Reference](/docs/codes) pages;
+everything shared (rewards, conditions, text) has its own page and applies to both.
+
+## Where everything lives
+
+```text
+plugins/ProVouchers/
+├── config.yml          # storage backend, anti-dupe, metrics  (see Config Reference)
+├── data.db             # created only when the storage backend is sqlite
+├── vouchers/           # one voucher per .yml file
+│   ├── crate_key.yml
+│   └── rank_token.yml
+└── codes/              # one code per .yml file
+    └── launch_gift.yml
+```
+
+- **Server-wide settings** (which database, anti-dupe behaviour, metrics) live in
+  `config.yml`.
+- **Each voucher and code** is its own file. The file name without `.yml` is the
+  default `id`/`code`, but you can override it with the `id:` or `code:` key inside
+  the file.
+- After editing any file, run `/voucher reload`. There is no need to restart.
+
+## Anatomy of a voucher file
+
+```yaml
+id: crate_key                 # identity (defaults to the file name)
+display-name: "<gold>Key"     # how the item is named (MiniMessage)
+item: { material: TRIPWIRE_HOOK, glow: true }   # what the item looks like
+lore: [ "<gray>Right-click" ] # item description lines (MiniMessage)
+cooldown: 0                   # per-player seconds between redeems
+expiry: ""                    # when the item stops working
+conditions: [ ... ]           # who may redeem it, and where  (see Conditions)
+rewards: [ ... ]              # what they get                 (see Rewards)
+random-rewards: [ ... ]       # weighted "pick one" rewards
+```
+
+Only `item` is strictly required (and even then `material` defaults to `PAPER`).
+Everything else has a sensible default.
+
+## How a redemption flows
+
+When a player right-clicks a voucher (or runs `/voucher redeem`), ProVouchers runs
+these steps in order and stops at the first failure:
+
+1. **Is it a real voucher/code?** Unknown or removed ids are rejected.
+2. **Is it redeemable?** `unredeemable: true` vouchers are display-only.
+3. **Owner check** (vouchers only): `owner-only` vouchers reject other players.
+4. **Expiry check**: expired vouchers and codes are rejected.
+5. **Game mode gate**: creative and spectator are blocked by default.
+6. **Cooldown check**: per-player, per-voucher.
+7. **Conditions**: every condition must pass; the first failure shows its message.
+8. **Anti-dupe / use limits** (checked off the main thread): a duplicate voucher
+   item or an exhausted code is rejected.
+9. **Rewards run**: always-run rewards plus one weighted random set, each reward
+   executed independently.
+
+Steps 1 to 7 are instant and on the player's thread. Step 8 touches the database,
+so it runs asynchronously, then control returns to the player to grant rewards.
+This keeps the server (and Folia regions) responsive.
+
+## Built on Strata
+
+ProVouchers does not re-implement scheduling, storage, text rendering, conditions,
+integrations, or metrics. It uses [Strata](https://github.com/alazso/strata) for
+all of that. Practically, this means:
+
+- **Conditions** (permission, region, economy, and so on) are evaluated by Strata,
+  so they share one consistent config shape (see [Conditions](/docs/conditions)).
+- **Integrations** (economy, permissions, custom items, placeholders) are provided
+  by Strata's hooks, so installing a supported plugin "just works" without
+  ProVouchers-specific setup (see [Integrations](/docs/integrations)).
+- **Text** is rendered with MiniMessage and PlaceholderAPI in one place (see
+  [Text and Placeholders](/docs/text)).
+
+That is the whole model. The rest of the docs are reference pages for each piece.

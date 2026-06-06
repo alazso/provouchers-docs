@@ -1,31 +1,46 @@
 ---
 title: Getting Started
-description: Install ProVouchers and Strata, then create your first voucher.
+description: Install Strata and ProVouchers, then create, give, and redeem your first voucher.
 ---
 
-ProVouchers depends on the [Strata](https://github.com/alazso/strata) shared
-library, the same install model as Vault or LuckPerms. Strata is installed once
-on the server and ProVouchers loads after it automatically.
+This page takes you from an empty server to a working voucher in a few minutes.
 
 ## 1. Install Strata
 
-Download `strata-<version>.jar` from the
+ProVouchers depends on the [Strata](https://github.com/alazso/strata) shared
+library, the same install model as Vault or LuckPerms. Download
+`strata-<version>.jar` from the
 [Strata releases](https://github.com/alazso/strata/releases) and drop it into
-`plugins/`. The heavy runtime libraries (Kotlin standard library, JDBC drivers,
-connection pool) are downloaded by Paper's library loader on first start, so you
-install nothing else.
+`plugins/`. Strata downloads its own runtime libraries (Kotlin runtime, JDBC
+drivers, connection pool) on first start, so you install nothing else.
 
 ## 2. Install ProVouchers
 
 Download `provouchers-<version>.jar` from the
 [ProVouchers releases](https://github.com/alazso/provouchers/releases), drop it
-into `plugins/`, and restart the server. On startup ProVouchers checks that
-Strata is present and refuses to enable without it.
+into `plugins/`, and restart. On startup ProVouchers checks that Strata is
+present and refuses to enable without it (you will see a clear console message if
+it is missing).
 
-## 3. Create a voucher
+## 3. Find the files
 
-Voucher definitions live in `plugins/ProVouchers/vouchers/`. Each file is one
-voucher, keyed by its `id`.
+After the first start, ProVouchers creates this folder:
+
+```text
+plugins/ProVouchers/
+├── config.yml            # storage, anti-dupe, and metrics settings
+├── vouchers/
+│   └── example.yml       # one voucher per file
+└── codes/
+    └── example.yml       # one code per file
+```
+
+Every `vouchers/*.yml` file is one voucher; every `codes/*.yml` file is one code.
+The file name (without `.yml`) is the default id.
+
+## 4. Create a voucher
+
+Make `plugins/ProVouchers/vouchers/starter.yml`:
 
 ```yaml title="vouchers/starter.yml"
 id: starter
@@ -35,32 +50,57 @@ item:
   glow: true
 lore:
   - "<gray>Right-click to claim your starter kit"
-cooldown: 0
 conditions:
   - type: permission
     permission: "provouchers.use.starter"
 rewards:
-  - "command: give %player% iron_sword 1"
+  - "item: IRON_SWORD 1"
+  - "item: COOKED_BEEF 16"
   - "message: <gold>Welcome! Your starter kit has been delivered."
 ```
 
-## 4. Give it out
+Then reload:
+
+```text
+/voucher reload
+```
+
+`/voucher reload` reports any mistakes per file (with the key and reason), so if
+something is wrong it tells you exactly where.
+
+## 5. Give and redeem it
 
 ```text
 /voucher give starter 1 Steve
 ```
 
-Reload your voucher files at any time with `/voucher reload`, which reports per
-file validation errors so a typo never fails silently.
+Steve holds the item and right-clicks to redeem. (Steve needs the
+`provouchers.use.starter` permission, since the voucher requires it.)
 
-## Storage
+## 6. Try a code
 
-ProVouchers uses Strata's storage layer for cooldowns, anti-dupe stamps, and the
-offline-give queue. The default backend is file-based SQLite, with MySQL,
-MariaDB, and PostgreSQL available for networks. Configure the backend in
-`config.yml`.
+Make `plugins/ProVouchers/codes/welcome.yml`:
 
-## Next steps
+```yaml title="codes/welcome.yml"
+code: WELCOME
+case-sensitive: false
+uses-per-player: 1
+rewards:
+  - "currency: give 500"
+  - "message: <green>Welcome aboard!"
+```
 
-More configuration reference (conditions, rewards, effects, codes, and the
-CrazyVouchers importer) lands as those features ship.
+Reload, then any player runs:
+
+```text
+/voucher redeem WELCOME
+```
+
+## Where to go next
+
+- [Core Concepts](/docs/concepts) explains vouchers vs codes and how a redemption
+  flows.
+- [Rewards](/docs/rewards) and [Conditions](/docs/conditions) are the two pages
+  you will reference most.
+- [Items](/docs/items) covers custom textures and items from ItemsAdder, Oraxen,
+  and Nexo.

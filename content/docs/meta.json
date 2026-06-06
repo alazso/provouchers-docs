@@ -3,7 +3,18 @@
   "pages": [
     "index",
     "getting-started",
+    "concepts",
     "vouchers",
-    "commands"
+    "codes",
+    "items",
+    "conditions",
+    "rewards",
+    "text",
+    "commands",
+    "storage",
+    "anti-dupe",
+    "integrations",
+    "config",
+    "faq"
   ]
 }

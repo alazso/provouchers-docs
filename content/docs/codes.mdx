@@ -1,0 +1,86 @@
+---
+title: Code Reference
+description: Typeable redemption codes, with per-player and global use limits.
+---
+
+A code is one `plugins/ProVouchers/codes/<id>.yml` file. Players redeem it by
+typing `/voucher redeem <code>`. Codes share the [Conditions](/docs/conditions) and
+[Rewards](/docs/rewards) systems with vouchers; this page covers the fields that
+are specific to codes.
+
+## Full example
+
+```yaml title="codes/launch_gift.yml"
+code: LAUNCH2026
+case-sensitive: false
+max-uses: 500
+uses-per-player: 1
+expiry: "2026-12-31T23:59:59Z"
+conditions:
+  - type: permission
+    permission: "provouchers.redeem"
+rewards:
+  - "currency: give 1000"
+  - "item: itemsadder:ax_wings_pack:phoenix_wings 1"
+  - "message: <gradient:#FFD700:#FF4500>Thanks for joining at launch!</gradient>"
+```
+
+## Fields
+
+| Key | Type | Default | Notes |
+| --- | --- | --- | --- |
+| `code` | string | file name | The literal text players type. |
+| `case-sensitive` | boolean | `false` | When `false`, `LAUNCH2026` and `launch2026` both match. |
+| `max-uses` | integer | `-1` | Global redemption cap across all players. `-1` means unlimited. |
+| `uses-per-player` | integer | `1` | How many times a single player may redeem it. |
+| `expiry` | string | `""` | Use an absolute ISO-8601 instant (see the note below). |
+| `conditions` | list | empty | See [Conditions](/docs/conditions). |
+| `rewards` | list | empty | See [Rewards](/docs/rewards). |
+| `random-rewards` | list | empty | Weighted "pick one" rewards. |
+| `has-argument` | boolean | `false` | Accept a trailing argument, exposed to rewards as `{arg}`. |
+
+## Use limits
+
+Codes have two independent limits, both backed by the database so they survive
+restarts:
+
+- **`uses-per-player`** caps how many times one player may redeem the code. With
+  the default `1`, each player may redeem it once.
+- **`max-uses`** caps the total redemptions across everyone. Set it to limit a
+  giveaway to the first N claims; leave it at `-1` for no global cap.
+
+Both are checked together, off the main thread, before any reward runs.
+
+## Arguments
+
+With `has-argument: true`, players pass a value that rewards can use through the
+`{arg}` token:
+
+```yaml title="codes/referral.yml"
+code: REFER
+has-argument: true
+rewards:
+  - "broadcast: <green>%player% was referred by {arg}!"
+  - "currency: give 100"
+```
+
+```text
+/voucher redeem REFER Steve
+```
+
+The `{arg}` is substituted into rewards and messages before MiniMessage is
+rendered. See [Rewards](/docs/rewards#tokens) for the full token list.
+
+## Expiry
+
+<Callout type="warn">
+Unlike voucher items, a code has no per-item give time. Use an **absolute**
+ISO-8601 instant (`2026-12-31T23:59:59Z`) for code expiry. A relative duration
+(`30d`) is not measured from a meaningful start point for codes.
+</Callout>
+
+## Tab completion
+
+`/voucher redeem` does not currently suggest code names in tab completion (codes
+are often meant to be shared out of band, not discovered). Type the code exactly,
+honouring `case-sensitive` when it is set.

@@ -1,0 +1,73 @@
+---
+title: config.yml Reference
+description: Every server-wide setting, annotated.
+---
+
+`plugins/ProVouchers/config.yml` holds server-wide settings. Per-voucher and
+per-code options live in their own files (see [Voucher Reference](/docs/vouchers)
+and [Code Reference](/docs/codes)).
+
+## The full file
+
+```yaml title="config.yml"
+storage:
+  # Backend: sqlite | mysql | mariadb | postgres
+  # SQLite is file-based and needs no extra setup; the others connect to a server.
+  backend: sqlite
+  # The settings below are used only by the networked backends.
+  host: localhost
+  port: 5432
+  database: provouchers
+  username: provouchers
+  password: ""
+  pool-size: 10
+
+anti-dupe:
+  # When a duplicate voucher is detected on redeem, remove the item instead of
+  # returning it to the player.
+  remove-on-discovery: true
+
+metrics:
+  # Submit anonymous usage statistics through Strata (bStats and FastStats).
+  # Set to false to opt out entirely.
+  enabled: true
+```
+
+## storage
+
+See [Storage and Database](/docs/storage) for full details.
+
+| Key | Default | Notes |
+| --- | --- | --- |
+| `storage.backend` | `sqlite` | `sqlite`, `mysql`, `mariadb`, or `postgres`. |
+| `storage.host` | `localhost` | Networked backends only. |
+| `storage.port` | `5432` | Networked backends only. Default `3306` for MySQL/MariaDB. |
+| `storage.database` | `provouchers` | Database name. |
+| `storage.username` | `provouchers` | Database user. |
+| `storage.password` | `""` | Database password. |
+| `storage.pool-size` | `10` | Max pooled connections. |
+
+An unknown backend value falls back to SQLite with a warning in the console.
+
+## anti-dupe
+
+See [Anti-Dupe and Anti-Exploit](/docs/anti-dupe).
+
+| Key | Default | Notes |
+| --- | --- | --- |
+| `anti-dupe.remove-on-discovery` | `true` | Remove a duplicate voucher when caught, instead of returning it. |
+
+## metrics
+
+| Key | Default | Notes |
+| --- | --- | --- |
+| `metrics.enabled` | `true` | Submit anonymous usage stats through Strata (bStats and FastStats). Set to `false` to opt out. |
+
+Metrics report only aggregate, non-identifying data (such as which storage backend
+is in use and how many vouchers are loaded). They never include player data.
+
+## Applying changes
+
+`config.yml` is read on startup. After editing it, restart the server (or reload
+the server) for storage and metrics changes to take effect. Voucher and code files,
+by contrast, are reloaded live with `/voucher reload`.

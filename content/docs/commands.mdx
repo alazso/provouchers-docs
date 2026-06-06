@@ -1,24 +1,62 @@
 ---
 title: Commands and Permissions
-description: The /voucher command tree and its permission nodes.
+description: The /voucher command tree and every permission node.
 ---
 
 All commands live under `/voucher`, with the aliases `/pv` and `/vouchers`.
 
 ## Commands
 
-| Command | Permission | Description |
-| --- | --- | --- |
-| `/voucher give <id> [amount] [player] [arg]` | `provouchers.give` | Give a voucher to yourself or another player. |
-| `/voucher giveall <id> [amount] [arg]` | `provouchers.giveall` | Give a voucher to every online player. |
-| `/voucher redeem <code> [arg]` | `provouchers.redeem` | Redeem a typeable code. |
-| `/voucher list` | `provouchers.list` | List loaded vouchers and the code count. |
-| `/voucher reload` | `provouchers.reload` | Reload voucher and code files, reporting per-file errors. |
+| Command | Permission | Role | Description |
+| --- | --- | --- | --- |
+| `/voucher give <id> [amount] [player]` | `provouchers.give` | admin | Give a voucher to yourself or another player. |
+| `/voucher giveall <id> [amount]` | `provouchers.giveall` | admin | Give a voucher to every online player. |
+| `/voucher redeem <code> [arg]` | `provouchers.redeem` | player | Redeem a typeable code. |
+| `/voucher list` | `provouchers.list` | admin | List loaded vouchers and the code count. |
+| `/voucher reload` | `provouchers.reload` | admin | Reload voucher and code files, reporting per-file errors. |
 
-When the target player is omitted on `give`, the voucher goes to the command
-sender. Running `give` from the console requires naming a player.
+### give
 
-## Bypass and utility nodes
+```text
+/voucher give crate_key            # to yourself (if you are a player)
+/voucher give crate_key 5          # 5 copies, to yourself
+/voucher give crate_key 5 Steve    # 5 copies, to Steve
+```
+
+When the player argument is omitted, the voucher goes to the command sender.
+Running `give` from the console requires naming a player. The voucher stacks until
+a player interacts with it; see [Anti-Dupe](/docs/anti-dupe) for why.
+
+### giveall
+
+```text
+/voucher giveall crate_key 1
+```
+
+Gives the voucher to every player currently online. Players who are offline are not
+included (an offline delivery queue is planned but not yet active).
+
+### redeem
+
+```text
+/voucher redeem WELCOME
+/voucher redeem REFER Steve        # with an argument, if the code uses one
+```
+
+Players use this for codes. The code must be typed exactly, honouring
+`case-sensitive` when the code sets it.
+
+### reload
+
+```text
+/voucher reload
+```
+
+Reloads every file in `vouchers/` and `codes/`. If a file has a mistake (an unknown
+reward type, a bad material, an invalid expiry, a malformed condition), the reload
+reports it with the file name and the reason, and keeps loading the rest.
+
+## Bypass and utility permissions
 
 | Permission | Effect |
 | --- | --- |
@@ -27,9 +65,23 @@ sender. Running `give` from the console requires naming a player.
 | `provouchers.bypass.owner` | Redeem an owner-only voucher belonging to another player. |
 | `provouchers.notify` | Receive a staff alert when a duplicate voucher is detected. |
 
+## Permission nodes you define
+
+Conditions of type `permission` reference whatever node you choose, by convention
+under `provouchers.use.<id>`:
+
+```yaml
+conditions:
+  - type: permission
+    permission: "provouchers.use.crate_key"
+```
+
+Grant that node to the players or groups who should be able to redeem the voucher.
+These are normal permissions you manage in your permissions plugin; they are not
+auto-created.
+
 ## Redeeming items
 
-Holding a voucher and right-clicking redeems it. The item is validated against
-its conditions, checked for duplication, consumed, and the rewards are granted.
-Placing a voucher into an item frame is blocked to prevent detaching it from its
-stamp.
+Holding a voucher and right-clicking redeems it (main or off hand). The item is
+validated, checked for duplication, consumed, and the rewards are granted. Placing
+a voucher into an item frame is blocked, to keep it tied to its anti-dupe stamp.

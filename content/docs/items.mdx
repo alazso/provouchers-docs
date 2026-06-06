@@ -1,0 +1,118 @@
+---
+title: Items
+description: Vanilla materials, custom model data, glow, and items from ItemsAdder, Oraxen, and Nexo.
+---
+
+The `item:` section of a voucher defines what the held item looks like. The same
+item references are also used by the [`item` reward](/docs/rewards#item).
+
+```yaml
+item:
+  material: PAPER          # vanilla material (default)
+  custom: ""               # optional provider item, see below
+  custom-model-data: 0     # optional resource-pack model id
+  glow: true               # optional enchant glint
+```
+
+## Vanilla materials
+
+`material` is a Bukkit material name, such as `PAPER`, `TRIPWIRE_HOOK`, `NETHER_STAR`,
+or `DIAMOND_SWORD`. It is **validated when you reload**, so a typo like `DIMAOND`
+is reported by `/voucher reload` rather than failing when the voucher is given.
+
+Lower case and the `minecraft:` prefix are both accepted (`paper`, `minecraft:paper`).
+
+## Glow
+
+```yaml
+item:
+  material: PAPER
+  glow: true
+```
+
+`glow: true` adds the enchantment glint without showing any enchantment in the
+tooltip. It works with no resource pack.
+
+## Custom model data
+
+```yaml
+item:
+  material: PAPER
+  custom-model-data: 1001
+```
+
+`custom-model-data` is a number a **resource pack** maps to a custom model. With no
+pack installed it has no visible effect (the item renders as normal `PAPER`). Use
+it when you already serve a pack that defines the model for that number.
+
+<Callout>
+Want to test custom model data quickly? A tiny pack can remap a vanilla item to a
+different vanilla model by number, so you can confirm it works without drawing a
+texture. ItemsAdder, Oraxen, and Nexo also assign custom model data automatically
+to their items (see below).
+</Callout>
+
+## Custom provider items (ItemsAdder, Oraxen, Nexo)
+
+Instead of a vanilla material, you can reference an item from a custom-item plugin
+with `custom: "provider:id"`:
+
+```yaml title="A voucher whose icon is an ItemsAdder item"
+item:
+  custom: "itemsadder:ax_wings_pack:phoenix_wings"
+  glow: true
+display-name: "<gradient:#FF4500:#FFD700>Phoenix Wings Voucher</gradient>"
+lore:
+  - "<gray>Right-click to claim your wings"
+```
+
+The text before the first colon is the **provider** (`itemsadder`, `oraxen`,
+`nexo`); the rest is that provider's own item id (which may itself contain colons,
+as ItemsAdder namespaces do). The provider's model is used, and your
+`display-name` and `lore` are applied on top. If you omit `display-name`, the
+provider item keeps its own name.
+
+```yaml title="Oraxen and Nexo look the same"
+item:
+  custom: "oraxen:cool_sword"
+```
+
+```yaml title="Nexo"
+item:
+  custom: "nexo:magic_wand"
+```
+
+### Requirements
+
+<Callout type="warn">
+Custom provider items are resolved through Strata's item hooks. For
+`custom: "itemsadder:..."` to render the real item, your server needs **both** the
+provider plugin (ItemsAdder/Oraxen/Nexo) **and** a Strata build that ships the
+matching item hook. If no hook can resolve the reference, the voucher falls back to
+its `material` (default `PAPER`). Check `/voucher reload` and the console if a
+custom item shows up as paper.
+</Callout>
+
+This is a deliberate design choice: ProVouchers does not integrate with each
+custom-item plugin directly. It asks Strata, so any provider Strata supports works
+the same way, with no ProVouchers-specific configuration.
+
+## Using provider items as rewards
+
+The same references work as rewards, so a voucher can give a custom item:
+
+```yaml
+rewards:
+  - "item: itemsadder:ax_wings_pack:phoenix_wings 1"
+  - "itemsadder: ax_wings_pack:phoenix_wings"   # shorthand, same result
+```
+
+See [Rewards](/docs/rewards#item) for the full item-reward syntax, amounts, and the
+provider keyword shorthand.
+
+## Advanced item options
+
+Per-item details such as dyes, trims, banner patterns, and stored enchantments are
+not yet expressed as config keys. For those, use a provider item (ItemsAdder,
+Oraxen, Nexo) which already encodes the full item, or give the item through a
+`command:` reward.

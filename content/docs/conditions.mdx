@@ -1,0 +1,134 @@
+---
+title: Conditions
+description: Gate who can redeem a voucher or code, and where, with a typed condition system.
+---
+
+Conditions decide whether a redemption is allowed. They apply equally to vouchers
+and codes. Every condition must pass; the **first** failing condition shows its
+message and stops the redemption.
+
+Conditions are evaluated by [Strata](https://github.com/alazso/strata), so they use
+one consistent shape across the ecosystem.
+
+## Shape
+
+Each condition is a list entry with a `type`, the keys that type needs, and an
+optional `deny` message (MiniMessage, shown to the player who failed):
+
+```yaml
+conditions:
+  - type: permission
+    permission: "provouchers.use.vip"
+    deny: "<red>This voucher is for VIPs."
+  - type: world
+    worlds: [ world, world_nether ]
+  - type: exp
+    level: 10
+```
+
+If you omit `deny`, a generic failure message is shown.
+
+## Condition types
+
+| `type` | Keys | Passes when | Needs |
+| --- | --- | --- | --- |
+| `permission` | `permission` | The player has the permission node | Bukkit (or a permission hook) |
+| `world` | `worlds` (list) | The player is in one of these worlds | nothing |
+| `gamemode` | `gamemodes` (list) | The player's game mode is in the list | nothing |
+| `exp` | `level` | The player's level is at least this value | nothing |
+| `expiry` | `expires` | The current time is before this instant | nothing |
+| `owner` | (none) | The player matches the context owner | nothing |
+| `economy` | `amount` | The player's balance is at least this | an economy provider (Vault) |
+| `rank` | `groups` (list) | The player is in one of these groups | a group-aware permission hook (LuckPerms) |
+| `region` | `regions` (list) | The player is standing in one of these regions | a region hook |
+| `papi` | `placeholder`, `operator`, `value` | The compared PlaceholderAPI output matches | PlaceholderAPI |
+| `playerstat` | `statistic`, `operator`, `value` | The compared statistic matches | nothing |
+
+<Callout>
+Hook-backed conditions (`economy`, `rank`, `region`) **deny gracefully** when their
+provider plugin is not installed. If you gate a voucher behind `region` but no
+region hook is present, the condition fails closed rather than crashing. Install
+the relevant plugin to make these conditions evaluate.
+</Callout>
+
+## Examples
+
+### Permission
+
+```yaml
+conditions:
+  - type: permission
+    permission: "provouchers.use.starter"
+    deny: "<red>You have not unlocked this voucher."
+```
+
+### World and game mode
+
+```yaml
+conditions:
+  - type: world
+    worlds: [ world ]
+    deny: "<red>Claim this in the Overworld."
+  - type: gamemode
+    gamemodes: [ survival, adventure ]
+```
+
+### Experience level
+
+```yaml
+conditions:
+  - type: exp
+    level: 30
+    deny: "<red>You must be level 30 or higher."
+```
+
+### Economy balance
+
+```yaml
+conditions:
+  - type: economy
+    amount: 1000
+    deny: "<red>You need at least $1000 to use this."
+```
+
+This checks a balance; it does not charge the player. To take currency, use a
+[`currency: take`](/docs/rewards#currency) reward.
+
+### Rank (LuckPerms groups)
+
+```yaml
+conditions:
+  - type: rank
+    groups: [ vip, mvp ]
+    deny: "<red>VIP rank required."
+```
+
+### Region (WorldGuard and claim plugins)
+
+```yaml
+conditions:
+  - type: region
+    regions: [ spawn ]
+    deny: "<red>You can only redeem this at spawn."
+```
+
+### PlaceholderAPI comparison
+
+```yaml
+conditions:
+  - type: papi
+    placeholder: "%player_level%"
+    operator: ">="
+    value: "50"
+    deny: "<red>Requires level 50."
+```
+
+`operator` is one of `==`, `!=`, `>`, `>=`, `<`, `<=`. Numeric comparisons are used
+when both sides are numbers, otherwise string equality.
+
+## How this differs from the built-in gates
+
+Independently of conditions, ProVouchers always applies a few built-in checks:
+the game-mode gate (creative and spectator blocked by default), the per-voucher
+cooldown, and `owner-only`. See [Core Concepts](/docs/concepts#how-a-redemption-flows)
+for the full order. Use `conditions` for everything else.

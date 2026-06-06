@@ -1,0 +1,165 @@
+---
+title: Rewards and Effects
+description: Every reward type, weighted random rewards, dynamic tokens, and graceful failure.
+---
+
+Rewards are what a player gets on a successful redeem. Vouchers and codes share the
+same reward system. Each reward is a string of the form `"<type>: <value>"`.
+
+```yaml
+rewards:
+  - "item: DIAMOND 1"
+  - "currency: give 250"
+  - "message: <green>You redeemed it!"
+```
+
+Two keys hold rewards:
+
+- **`rewards:`** runs every line, every time.
+- **`random-rewards:`** picks exactly one weighted set per redeem (see
+  [Random rewards](#random-rewards)).
+
+## Reward types
+
+| Type (and aliases) | Value format | Effect |
+| --- | --- | --- |
+| `command` (`console-command`, `console`) | a command | Runs from the console |
+| `player-command` (`p-command`) | a command | Runs as the player |
+| `message` (`msg`, `tell`) | MiniMessage | Private message to the player |
+| `broadcast` (`announce`) | MiniMessage | Message to the whole server |
+| `title` | `title\|subtitle` | Title and subtitle |
+| `actionbar` (`action-bar`) | MiniMessage | Action bar text |
+| `sound` | `key [volume] [pitch]` | Plays a sound |
+| `item` (`give-item`) | `<reference> [amount]` | Gives an item (vanilla or provider) |
+| `itemsadder` / `oraxen` / `nexo` | `<id> [amount]` | Provider item shorthand |
+| `currency` (`economy`, `money`, `eco`) | `[give\|take] <amount>` | Gives or takes currency |
+
+### command and player-command
+
+```yaml
+rewards:
+  - "command: give %player% diamond 1"   # from console
+  - "player-command: spawn"              # run as the player
+```
+
+`command` runs from the server console (full permissions). `player-command` runs
+as the player, subject to their permissions.
+
+### message, broadcast, title, actionbar
+
+```yaml
+rewards:
+  - "message: <green>Enjoy your reward!"
+  - "broadcast: <gold>%player% <yellow>just redeemed a Legendary voucher!"
+  - "title: <gradient:#FFD700:#FF4500>WELCOME</gradient>|<gray>to the server"
+  - "actionbar: <yellow>Reward claimed"
+```
+
+`title` splits on the first `|` into title and subtitle; the subtitle is optional.
+All four accept MiniMessage and PlaceholderAPI (see [Text](/docs/text)).
+
+### sound
+
+```yaml
+rewards:
+  - "sound: minecraft:entity.player.levelup"
+  - "sound: minecraft:ui.toast.challenge_complete 1 1.2"
+```
+
+The value is a namespaced sound key, then optional `volume` and `pitch` (both
+default to `1`).
+
+### item
+
+```yaml
+rewards:
+  - "item: DIAMOND 5"                                # vanilla material [amount]
+  - "item: NETHERITE_SWORD"                          # amount defaults to 1
+  - "item: itemsadder:ax_wings_pack:phoenix_wings 2" # provider item
+```
+
+The value is an item `<reference> [amount]`. The reference is either a vanilla
+material or a `provider:id` custom item (see [Items](/docs/items)). Vanilla
+material names and amounts are validated at load; provider items are resolved at
+redeem time.
+
+The provider keywords are shorthand that fold the provider into the reference:
+
+```yaml
+rewards:
+  - "itemsadder: ax_wings_pack:phoenix_wings"   # same as item: itemsadder:...
+  - "oraxen: cool_sword 1"
+  - "nexo: magic_wand"
+```
+
+If the player's inventory is full, the overflow is dropped at their feet.
+
+### currency
+
+```yaml
+rewards:
+  - "currency: give 250"
+  - "currency: take 100"
+  - "currency: 500"              # no verb means give
+  - "currency: give {random:100-500}"
+```
+
+`currency` deposits to or withdraws from the player's balance through the server
+economy. The verb (`give` or `take`) is optional and defaults to `give`. It works
+with Vault and any Vault-compatible economy (EssentialsX, CMI, ExcellentEconomy,
+CoinsEngine, PlayerPoints via its Vault bridge) for that provider's currency, with
+no extra setup. If no economy is installed, the reward is skipped and logged.
+
+## Tokens
+
+Before MiniMessage and PlaceholderAPI run, these tokens are substituted in every
+reward value:
+
+| Token | Becomes |
+| --- | --- |
+| `%player%` / `{player}` | The redeeming player's name |
+| `{arg}` | The argument from `/voucher redeem <code> <arg>` (codes with `has-argument`) |
+| `{random:min-max}` | A random integer in the inclusive range |
+
+```yaml
+rewards:
+  - "command: give %player% gold_ingot {random:1-3}"
+  - "broadcast: <gold>%player% won {random:100-1000} coins!"
+```
+
+`%player%` and PlaceholderAPI placeholders (`%vault_eco_balance%`, and so on)
+both work; see [Text and Placeholders](/docs/text) for the resolution order.
+
+## Random rewards
+
+`random-rewards` is a list of weighted sets. Exactly one set is chosen per redeem,
+with probability proportional to its `weight` over the total. The chosen set runs
+**in addition** to the always-run `rewards`.
+
+```yaml
+rewards:
+  - "message: <gray>Opening..."            # always runs
+random-rewards:
+  - weight: 70
+    rewards:
+      - "item: GOLD_INGOT {random:1-3}"
+  - weight: 25
+    rewards:
+      - "item: DIAMOND 1"
+  - weight: 5
+    rewards:
+      - "item: NETHERITE_INGOT 1"
+      - "broadcast: <gradient:#FF4500:#FFD700>%player% hit the JACKPOT!</gradient>"
+```
+
+Weights do not need to sum to 100; they are normalised. In the example above the
+chances are 70%, 25%, and 5%.
+
+## Graceful failure
+
+Each reward runs independently. If one reward fails (a command that errors, a
+provider item that is not installed, a missing economy), it is logged against its
+voucher or code and skipped, and the remaining rewards still run. A typo that can
+be caught earlier (an unknown reward type, a bad item material, a non-numeric
+currency amount) is reported by `/voucher reload` instead, before the voucher is
+ever used.

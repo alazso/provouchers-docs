@@ -1,0 +1,209 @@
+---
+title: FAQ and Troubleshooting
+description: Common questions, edge cases, and how to fix things that look wrong.
+---
+
+## Setup
+
+### What is ProVouchers, in one sentence?
+
+A plugin that turns rewards into items players hold (vouchers) or words they type
+(codes), defined in YAML, with anti-dupe protection and a typed reward and
+condition system.
+
+### Do I really need Strata?
+
+Yes. ProVouchers is built on [Strata](https://github.com/alazso/strata) and will not
+enable without it. Install `strata-<version>.jar` into `plugins/` alongside
+ProVouchers. If Strata is missing, the console shows a clear message and ProVouchers
+disables itself cleanly.
+
+### It says it disabled on startup. Why?
+
+Two reasons cause a clean disable: the server is not on Java 25 / Paper 26.1+, or
+Strata is not installed (or loaded after ProVouchers). The console line tells you
+which.
+
+### Does it work on Folia?
+
+Yes. ProVouchers is Folia-safe throughout: redemption checks run on the player's
+region thread, database work runs asynchronously, and rewards are scheduled back on
+the player.
+
+## Configuration
+
+### Where do I configure a voucher?
+
+In `plugins/ProVouchers/vouchers/<name>.yml`, one voucher per file. Codes live in
+`plugins/ProVouchers/codes/`. Server-wide settings (database, anti-dupe, metrics)
+live in `plugins/ProVouchers/config.yml`. See [Core Concepts](/docs/concepts).
+
+### How do I apply changes without restarting?
+
+Run `/voucher reload`. It reloads every voucher and code file and reports mistakes
+per file. Changes to `config.yml` (storage, metrics) need a server restart.
+
+### `/voucher reload` printed an error. How do I read it?
+
+The format is `file.yml: <where> <reason>`, for example
+`crate_key.yml: voucher 'crate_key': item.material unknown material 'DIMAOND'`. Fix
+the named key and reload again. The other files still load while one is broken.
+
+### Can I use `&` colour codes?
+
+No. ProVouchers uses MiniMessage (`<gold>`, `<gradient:...>`, `<#FF8800>`). See
+[Text and Placeholders](/docs/text). Legacy `&` codes are not parsed.
+
+### My permission condition does nothing.
+
+The key is `permission:`, not `value:`:
+
+```yaml
+conditions:
+  - type: permission
+    permission: "provouchers.use.example"   # correct
+```
+
+Each condition type has its own key (`world` uses `worlds`, `exp` uses `level`).
+See [Conditions](/docs/conditions).
+
+## Items and textures
+
+### My custom item shows up as plain paper.
+
+`custom: "itemsadder:..."` is resolved through a Strata item hook. If your Strata
+build does not ship that provider's hook, or the provider plugin is not installed,
+the voucher falls back to its `material` (default `PAPER`). See
+[Items](/docs/items#requirements). Vanilla `custom-model-data` similarly needs a
+resource pack to show.
+
+### How do I give an item with a custom texture?
+
+Two ways: set `custom-model-data` if you serve a resource pack that defines the
+model, or reference a provider item with `custom: "itemsadder:..."` (ItemsAdder,
+Oraxen, Nexo). See [Items](/docs/items).
+
+### How do I test custom model data without making a texture?
+
+Ship a tiny resource pack that remaps a vanilla item to a different vanilla model by
+number. Then a `PAPER` with that `custom-model-data` renders as, say, a diamond.
+This confirms the wiring without any art.
+
+### Can I set dyes, trims, or banner patterns in config?
+
+Not as individual keys yet. Use a provider item (ItemsAdder, Oraxen, Nexo) that
+already encodes the full item, or give the item through a `command:` reward.
+
+## Rewards and economy
+
+### A reward did not run, but the others did.
+
+Rewards run independently. A reward that fails (a command that errors, a provider
+item that is not installed, no economy plugin) is logged to the console against its
+voucher and skipped, so the rest still run. Check the console for a line naming the
+reward and the reason. See [Rewards](/docs/rewards#graceful-failure).
+
+### My `currency` reward did nothing.
+
+`currency` needs a Vault-compatible economy installed. With no economy provider, the
+reward is skipped and logged. Install Vault and an economy plugin. See
+[Integrations](/docs/integrations#economy).
+
+### How do I charge a player to redeem a voucher?
+
+Check their balance with an `economy` condition, and deduct with a `currency: take`
+reward:
+
+```yaml
+conditions:
+  - type: economy
+    amount: 500
+    deny: "<red>You need $500."
+rewards:
+  - "currency: take 500"
+  - "item: DIAMOND 1"
+```
+
+### How do I give a different reward each time?
+
+Use `random-rewards` with weighted sets; one is chosen per redeem. See
+[Random rewards](/docs/rewards#random-rewards).
+
+### Can a voucher run another plugin's command?
+
+Yes. Use a `command:` reward (console) or `player-command:` (as the player):
+
+```yaml
+rewards:
+  - "command: crates give %player% vote 1"
+```
+
+## Limits and expiry
+
+### My voucher expired the moment I gave it.
+
+You probably put a relative duration on a **code** (`expiry: "30d"`). Codes have no
+per-item give time, so use an absolute ISO instant for code expiry
+(`2026-12-31T23:59:59Z`). On voucher **items**, `30d` works and is measured from
+the give time. See [Voucher expiry](/docs/vouchers#expiry).
+
+### A player's cooldown reset after a restart.
+
+Cooldowns are currently held in memory and reset on restart. For a limit that
+survives restarts, use a code's `uses-per-player`, or `owner-only` for one-shot
+items. This is noted on the [Voucher Reference](/docs/vouchers#cooldown).
+
+### How do I limit a code to the first N players?
+
+Set `max-uses` on the code. Set `uses-per-player` for a per-player cap. Both survive
+restarts. See [Code Reference](/docs/codes#use-limits).
+
+### How do I make a voucher only the recipient can redeem?
+
+Set `owner-only: true`. The recipient's identity is stamped when the voucher is
+given, and other players are rejected. See [Flags](/docs/vouchers#flags).
+
+### How do I make a display-only item that cannot be redeemed?
+
+Set `unredeemable: true`. It looks like a voucher but does nothing when
+right-clicked, useful for collectibles or showcases.
+
+## Anti-dupe and security
+
+### Can players duplicate vouchers?
+
+A duplicated voucher shares the original's nonce, so the copy resolves as a
+duplicate on redeem and is rejected. Creative redemption is blocked by default and
+item frames are denied. See [Anti-Dupe](/docs/anti-dupe).
+
+### Why can't I redeem a voucher in creative?
+
+Creative and spectator are blocked by default, because creative makes item cloning
+trivial. Grant `provouchers.bypass.gamemode` to allow it.
+
+### How do I get alerts when someone tries to dupe?
+
+Grant `provouchers.notify` to your staff. They receive a chat alert naming the
+player and the voucher.
+
+## Commands and giving
+
+### Can I give a voucher to an offline player?
+
+Not yet. `give` and `giveall` reach online players only; an offline-give queue is
+planned. Give the voucher when the player is online.
+
+### `/voucher give` from the console did nothing.
+
+From the console you must name a target player: `/voucher give crate_key 1 Steve`.
+Without a player argument, `give` targets the command sender, which the console is
+not.
+
+## Migrating
+
+### Can I import from CrazyVouchers?
+
+A migration command is planned but not yet available. For now, recreate vouchers as
+ProVouchers YAML files. The [Voucher Reference](/docs/vouchers) and
+[Rewards](/docs/rewards) pages map most CrazyVouchers concepts directly (rewards,
+conditions, cooldowns, codes).
