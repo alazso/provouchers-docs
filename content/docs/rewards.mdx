@@ -33,6 +33,8 @@ Two keys hold rewards:
 | `item` (`give-item`) | `<reference> [amount]` | Gives an item (vanilla or provider) |
 | `itemsadder` / `oraxen` / `nexo` | `<id> [amount]` | Provider item shorthand |
 | `currency` (`economy`, `money`, `eco`) | `[give\|take] <amount>` | Gives or takes currency |
+| `group` (`rank`) | `<add\|remove> <group> [duration]` | Adds or removes a permission group |
+| `permission` (`perm`) | `<add\|deny\|remove\|set> <node> [value]` | Sets or clears a permission node |
 
 ### command and player-command
 
@@ -109,6 +111,45 @@ economy. The verb (`give` or `take`) is optional and defaults to `give`. It work
 with Vault and any Vault-compatible economy (EssentialsX, CMI, ExcellentEconomy,
 CoinsEngine, PlayerPoints via its Vault bridge) for that provider's currency, with
 no extra setup. If no economy is installed, the reward is skipped and logged.
+
+### group
+
+```yaml
+rewards:
+  - "group: add vip"          # permanent membership
+  - "group: add vip 7d"       # temporary, expires in 7 days
+  - "group: remove trial"     # remove from a group
+  - "rank: add mvp 30d"       # rank is an alias for group
+```
+
+`group` adds the player to or removes them from a permission group. An optional
+duration on `add` (`7d`, `12h`, `90m`, `45s`) makes the membership temporary and
+self-expiring. This needs a group-aware, write-capable permission provider
+(LuckPerms); without one the reward is skipped and logged. Groups are not created
+by ProVouchers; the group must already exist in your permissions plugin.
+
+### permission
+
+```yaml
+rewards:
+  - "permission: add essentials.fly"        # set the node to true
+  - "permission: deny some.restricted.node" # set the node to false
+  - "permission: remove essentials.fly"     # clear a directly-set node
+  - "permission: set some.node false"       # set an explicit value
+  - "perm: add worldedit.navigation.jumpto" # perm is an alias
+```
+
+`permission` sets or clears a single permission node on the player. `add`/`deny` set
+the node to true/false, `remove` clears a node you previously set, and
+`set <node> <true|false>` is the explicit form. This also needs a write-capable
+permission provider (LuckPerms).
+
+<Callout>
+Group and permission rewards are written off the main thread (permission writes hit
+the data store). Pair them with a `message:` reward if you want to tell the player
+what they received. Granting a temporary group is the clean way to sell timed
+ranks, replacing fragile `command:` lines like `lp user %player% parent addtemp ...`.
+</Callout>
 
 ## Tokens
 

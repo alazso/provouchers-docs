@@ -58,9 +58,18 @@ conditions:
     groups: [ vip, mvp ]
 ```
 
-Granting a rank or permission as a **reward** is best done today with a
-`command:` reward (for example `lp user %player% parent addtemp vip 7d`). Native
-rank-granting rewards are planned.
+Granting a rank or permission as a **reward** is native, backed by LuckPerms
+(Strata 0.6.2+):
+
+```yaml
+rewards:
+  - "group: add vip 7d"                 # temporary rank
+  - "permission: add essentials.fly"    # set a permission node
+```
+
+See the [`group`](/docs/rewards#group) and
+[`permission`](/docs/rewards#permission) rewards. These replace fragile
+`lp user %player% parent addtemp ...` command lines and run off the main thread.
 
 ## Custom items
 
