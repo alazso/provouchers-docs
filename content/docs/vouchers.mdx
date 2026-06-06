@@ -1,0 +1,135 @@
+---
+title: Vouchers and Codes
+description: The full configuration reference for voucher and code files.
+---
+
+Voucher definitions live in `plugins/ProVouchers/vouchers/*.yml` (one voucher per
+file) and codes in `plugins/ProVouchers/codes/*.yml`. After editing, run
+`/voucher reload`, which reports per-file errors instead of failing silently.
+
+## Item
+
+```yaml
+item:
+  material: PAPER          # vanilla material; used when no custom item resolves
+  custom: "itemsadder:ax_wings_pack:phoenix_wings"   # optional provider item
+  custom-model-data: 1001  # optional; applied to the material path only
+  glow: true               # optional enchant glint
+```
+
+- **`custom`** references a third-party item through a Strata item hook
+  (`itemsadder:`, `oraxen:`, and so on). The text before the first colon is the
+  provider; the rest is its item id. When it resolves, that item's model is used
+  and `custom-model-data` is ignored (the provider already supplies the model).
+  When no hook resolves it, ProVouchers falls back to `material`.
+- **`custom-model-data`** only changes the icon when a resource pack maps the
+  number to a model. With no pack it has no visible effect.
+
+## Name and lore
+
+```yaml
+display-name: "<gradient:#FFD700:#FF4500>Crate Key</gradient>"
+lore:
+  - "<gray>Right-click to open"
+```
+
+Both are MiniMessage (RGB, gradients, and PlaceholderAPI when installed). If
+`display-name` is omitted, a custom provider item keeps its own name; a vanilla
+item falls back to the voucher id.
+
+## Flags and limits
+
+```yaml
+unredeemable: false   # display-only item that cannot be redeemed
+owner-only: false     # only the player it was given to may redeem it
+has-argument: false   # accept a trailing argument, exposed as {arg}
+cooldown: 0           # per-player seconds between redemptions
+expiry: ""            # see below
+```
+
+**`owner-only`** stamps the recipient's UUID at give time and is enforced on
+redeem; `provouchers.bypass.owner` overrides it.
+
+**`expiry`** accepts:
+
+- empty -> never expires
+- an ISO-8601 instant, for example `2026-12-31T23:59:59Z` (a fixed moment)
+- a relative duration: `30d`, `12h`, `90m`, `45s`. For an **item** voucher this is
+  measured from the moment the item was given; for **codes**, prefer an absolute
+  instant.
+
+## Conditions
+
+Conditions are evaluated by Strata. Each is a section with a `type`, type-specific
+keys, and an optional `deny` message (MiniMessage, shown to the failing player).
+
+```yaml
+conditions:
+  - type: permission
+    permission: "provouchers.use.example"
+    deny: "<red>You have not unlocked this."
+  - type: world
+    worlds: [ world, world_nether ]
+  - type: exp
+    level: 5
+```
+
+| type | key | notes |
+| --- | --- | --- |
+| `permission` | `permission` | Bukkit permission or a permission hook |
+| `world` | `worlds` | list of world names |
+| `gamemode` | `gamemodes` | list of game modes |
+| `exp` | `level` | player level at least the value |
+| `economy` | `amount` | requires an economy hook |
+| `rank` | `groups` | requires a group-aware permission hook |
+| `region` | `regions` | requires a region hook |
+| `papi` | `placeholder`, `operator`, `value` | compares PlaceholderAPI output |
+
+## Rewards
+
+`rewards` always run on a successful redeem. Each line is `"<type>: <value>"`.
+
+```yaml
+rewards:
+  - "command: give %player% diamond 1"     # from console
+  - "player-command: spawn"                # run as the player
+  - "message: <green>You redeemed it!"
+  - "broadcast: <gold>%player% won big"
+  - "title: <gold>Title|<gray>Subtitle"    # title|subtitle
+  - "actionbar: <yellow>Claimed"
+  - "sound: minecraft:entity.player.levelup 1 1"   # key [volume] [pitch]
+```
+
+Tokens resolved before MiniMessage: `%player%` / `{player}`, `{arg}`, and
+`{random:min-max}` for a random integer.
+
+## Random rewards
+
+Exactly one set is chosen per redeem, weighted by its `weight` over the total,
+and runs in addition to `rewards`.
+
+```yaml
+random-rewards:
+  - weight: 80
+    rewards:
+      - "command: give %player% gold_ingot {random:1-3}"
+  - weight: 20
+    rewards:
+      - "command: give %player% emerald 1"
+      - "broadcast: <gold>%player% hit the rare reward!"
+```
+
+## Codes
+
+Code files share the reward and condition model, redeemed with
+`/voucher redeem <code>`.
+
+```yaml
+code: WELCOME2026
+case-sensitive: false
+max-uses: 100        # global cap across all players; -1 for unlimited
+uses-per-player: 1
+expiry: ""
+rewards:
+  - "message: <green>Welcome aboard!"
+```
