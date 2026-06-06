@@ -2,19 +2,23 @@
   "title": "ProVouchers",
   "pages": [
     "index",
+    "---Getting Started---",
     "getting-started",
     "concepts",
+    "---Writing Vouchers---",
     "vouchers",
     "codes",
     "items",
     "conditions",
     "rewards",
     "text",
+    "---Server Administration---",
     "commands",
     "storage",
     "anti-dupe",
-    "integrations",
     "config",
+    "---Help---",
+    "integrations",
     "faq"
   ]
 }
