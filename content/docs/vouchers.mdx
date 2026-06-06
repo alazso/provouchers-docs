@@ -77,11 +77,9 @@ cooldown: 86400   # seconds; 24 hours
 A per-player, per-voucher cooldown in seconds. `0` (the default) means no
 cooldown. `provouchers.bypass.cooldown` ignores it.
 
-<Callout type="warn">
-Cooldowns are currently held in memory and reset when the server restarts. Use a
-voucher's other limits (a code's `uses-per-player`, or `owner-only`) when you need
-a limit that survives restarts.
-</Callout>
+Cooldowns are persisted to the database and reloaded when a player joins, so they
+survive restarts. On a network sharing one database (see
+[Storage](/docs/storage)), a cooldown applies across all servers.
 
 ## Expiry
 

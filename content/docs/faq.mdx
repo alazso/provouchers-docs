@@ -148,11 +148,11 @@ per-item give time, so use an absolute ISO instant for code expiry
 (`2026-12-31T23:59:59Z`). On voucher **items**, `30d` works and is measured from
 the give time. See [Voucher expiry](/docs/vouchers#expiry).
 
-### A player's cooldown reset after a restart.
+### Do cooldowns survive a restart?
 
-Cooldowns are currently held in memory and reset on restart. For a limit that
-survives restarts, use a code's `uses-per-player`, or `owner-only` for one-shot
-items. This is noted on the [Voucher Reference](/docs/vouchers#cooldown).
+Yes. Cooldowns are persisted to the database and reloaded when a player joins. On a
+network sharing one database, a voucher's cooldown applies across all servers. See
+the [Voucher Reference](/docs/vouchers#cooldown).
 
 ### How do I limit a code to the first N players?
 
