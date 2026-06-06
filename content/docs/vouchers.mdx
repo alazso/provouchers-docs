@@ -98,10 +98,26 @@ rewards:
   - "title: <gold>Title|<gray>Subtitle"    # title|subtitle
   - "actionbar: <yellow>Claimed"
   - "sound: minecraft:entity.player.levelup 1 1"   # key [volume] [pitch]
+  - "item: DIAMOND 5"                              # vanilla material [amount]
+  - "item: itemsadder:ax_wings_pack:phoenix_wings" # custom provider item
+  - "itemsadder: ax_wings_pack:phoenix_wings 2"    # provider keyword shorthand
 ```
 
 Tokens resolved before MiniMessage: `%player%` / `{player}`, `{arg}`, and
 `{random:min-max}` for a random integer.
+
+### Item rewards
+
+The `item` reward gives an item directly, with no command needed. The value is
+`<reference> [amount]`, where the reference is either a vanilla material
+(`DIAMOND`) or a `provider:id` custom item served by a hook (ItemsAdder, Oraxen,
+Nexo). The provider keywords `itemsadder`, `oraxen`, and `nexo` are shorthand:
+`itemsadder: foo` means `item: itemsadder:foo`. Vanilla material names and
+amounts are validated at load; provider item ids are resolved at redeem time.
+
+Each reward runs independently: a single failing reward (for example a provider
+that is not installed) is logged against its voucher and skipped, never aborting
+the others.
 
 ## Random rewards
 
