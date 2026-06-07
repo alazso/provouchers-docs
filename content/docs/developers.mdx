@@ -1,0 +1,129 @@
+---
+title: Developer API
+description: Depend on ProVouchers, query vouchers, and react to redemptions.
+---
+
+ProVouchers ships a small, interface-only API (`so.alaz.provouchers.api`) for other
+plugins: a service to query and give vouchers, and events to veto or observe
+redemptions. It is available since **0.4.0** and, while ProVouchers is pre-1.0, may
+change between minor versions.
+
+## Depend on the API
+
+Add the alazso repository and the `provouchers-api` artifact, compile-time only.
+The runtime classes ship inside the installed ProVouchers plugin, so you bundle
+nothing.
+
+```kotlin tab="build.gradle.kts"
+repositories {
+    maven("https://repo.alaz.so/releases") { name = "alazso" }
+}
+
+dependencies {
+    compileOnly("so.alaz.provouchers:provouchers-api:0.4.0")
+}
+```
+
+```xml tab="pom.xml"
+<repository>
+  <id>alazso</id>
+  <url>https://repo.alaz.so/releases</url>
+</repository>
+
+<dependency>
+  <groupId>so.alaz.provouchers</groupId>
+  <artifactId>provouchers-api</artifactId>
+  <version>0.4.0</version>
+  <scope>provided</scope>
+</dependency>
+```
+
+Declare ProVouchers as a dependency in your `paper-plugin.yml` so it loads first:
+
+```yaml
+dependencies:
+  server:
+    ProVouchers:
+      load: BEFORE
+      required: true   # or false for a soft integration
+```
+
+## The VoucherService
+
+Obtain it from Bukkit's services manager once ProVouchers has enabled:
+
+```java
+import so.alaz.provouchers.api.VoucherService;
+
+VoucherService vouchers = getServer().getServicesManager().load(VoucherService.class);
+if (vouchers != null) {
+    vouchers.getVoucher("crate_key").ifPresent(v ->
+        getLogger().info("Cooldown: " + v.cooldownSeconds() + "s"));
+
+    vouchers.give(player, "crate_key", 1);   // async, Folia-safe
+}
+```
+
+| Method | Returns |
+| --- | --- |
+| `getVoucher(id)` | `Optional<Voucher>` |
+| `voucherIds()` | `List<String>` |
+| `getCode(input)` | `Optional<VoucherCode>` |
+| `voucherCount()` / `codeCount()` | `int` |
+| `give(player, voucherId, amount)` | `boolean` (false if the id is unknown) |
+
+`Voucher` and `VoucherCode` are read-only views (id, display name, lore, flags,
+cooldown, expiry, use limits). They are implemented by ProVouchers and must not be
+implemented by consumers.
+
+## Events
+
+All events live in `so.alaz.provouchers.api.event` and are standard Bukkit events,
+so you listen for them the usual way.
+
+### Veto a redemption
+
+`VoucherPreRedeemEvent` and `VoucherCodePreRedeemEvent` are **cancellable** and fire
+before the redemption commits, after ProVouchers' own checks. Cancel one to veto:
+
+```java
+@EventHandler
+public void onPreRedeem(VoucherPreRedeemEvent event) {
+    if (isFrozen(event.getPlayer())) {
+        event.setCancelled(true);   // anti-cheat, spending limits, etc.
+    }
+}
+```
+
+### Observe a redemption
+
+`VoucherRedeemEvent` and `VoucherCodeRedeemEvent` fire **after** a successful redeem
+(item consumed, anti-dupe passed, rewards granted). They are not cancellable:
+
+```java
+@EventHandler
+public void onRedeem(VoucherRedeemEvent event) {
+    getLogger().info(event.getPlayer().getName()
+        + " redeemed " + event.getVoucher().id()
+        + " (batch " + event.getBatchId() + ")");
+}
+```
+
+| Event | Cancellable | When |
+| --- | --- | --- |
+| `VoucherPreRedeemEvent` | yes | before an item voucher is redeemed |
+| `VoucherRedeemEvent` | no | after an item voucher is redeemed |
+| `VoucherCodePreRedeemEvent` | yes | before a code is redeemed |
+| `VoucherCodeRedeemEvent` | no | after a code is redeemed |
+
+<Callout type="warn">
+These events fire on the redeeming player's region thread, not necessarily the
+global main thread. Keep handlers Folia-safe: schedule any cross-region work
+through your own scheduler rather than assuming the main thread.
+</Callout>
+
+## Stability
+
+The API is annotated with `@ApiStatus.AvailableSince("0.4.0")`, and the read-only
+types are `@ApiStatus.NonExtendable`. While ProVouchers is in the `0.x` series the
+surface may change between minor releases; it stabilises at `1.0.0`.
