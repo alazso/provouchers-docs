@@ -56,11 +56,12 @@ export default function HomePage() {
 
         <h1 className="text-gradient text-5xl font-bold tracking-tight sm:text-6xl">{appName}</h1>
         <p className="mt-4 text-lg font-medium text-fd-foreground sm:text-xl">
-          Item vouchers and redeemable codes for Paper and Folia.
+          Create vouchers with a powerful ecosystem of integrations.
         </p>
         <p className="mt-3 max-w-2xl text-fd-muted-foreground">
-          A config-driven reward and condition system, persistent anti-dupe protection, and
-          custom-item support, built on the Strata shared library.
+          Vouchers and redeemable codes, a config-driven reward and condition system, and
+          persistent anti-dupe, with a deep set of integrations built to help your server
+          stand out. Powered by the Strata shared library.
         </p>
 
         <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
