@@ -1,0 +1,73 @@
+---
+title: Metrics and Telemetry
+description: What ProVouchers reports, why, and how to opt out.
+---
+
+ProVouchers submits anonymous, aggregate usage statistics through Strata, which
+ships both [bStats](https://bstats.org) and FastStats. The data helps prioritise
+which platforms, integrations, and features to invest in. It is enabled by default
+and can be turned off with a single setting.
+
+<Callout>
+Metrics are **aggregate and non-identifying**. No player names, UUIDs, IP
+addresses, voucher contents, or command output ever leave the server. Everything
+below is either a server-wide count or a coarse category.
+</Callout>
+
+## Opting out
+
+Set `metrics.enabled` to `false` in `config.yml` and restart the server:
+
+```yaml title="config.yml"
+metrics:
+  enabled: false
+```
+
+This disables every chart and both providers at once.
+
+## What is collected
+
+The same definitions are reported to bStats and FastStats. Charts fall into two
+groups: a snapshot of how the plugin is configured, and counts of activity since
+the server started.
+
+### Environment and configuration
+
+Read from the loaded configuration on each submission.
+
+| Chart | Meaning |
+| --- | --- |
+| `storage_backend` | Which database backend is in use (`sqlite`, `mysql`, `mariadb`, `postgres`). |
+| `active_integrations` | Which optional integrations are installed (Vault, PlaceholderAPI, LuckPerms, WorldGuard, ItemsAdder, Oraxen, Nexo, Head Database, MiniPlaceholders). |
+| `loaded_vouchers` / `loaded_codes` | How many vouchers and codes are loaded. |
+| `voucher_count_bucket` / `code_count_bucket` | The same totals as a coarse range (`0`, `1-5`, `6-20`, `21-50`, `51-100`, `100+`). |
+| `most_common_reward` | The most-used reward type across all configured vouchers and codes. |
+| `reward_types_used` | The distribution of reward types in your configuration. |
+| `condition_types_used` | Which condition types you gate redemptions behind. |
+| `item_providers_used` | Where voucher items come from (`vanilla`, `player-head`, or a custom provider). |
+| `uses_random_rewards` | Whether any voucher or code uses weighted random reward sets. |
+| `uses_cooldowns` | Whether any voucher sets a cooldown. |
+| `uses_expiry` | Whether any voucher or code sets an expiry. |
+| `uses_conditions` | Whether any voucher or code gates on conditions. |
+
+### Activity
+
+Counts accumulated since the server started. They reset to zero on restart and
+never contain anything about *who* redeemed *what*.
+
+| Chart | Meaning |
+| --- | --- |
+| `redemptions` | Total successful redemptions. |
+| `voucher_redemptions` / `code_redemptions` | The split between item vouchers and typed codes. |
+| `dupes_blocked` | Duplicate voucher items rejected by anti-dupe. |
+| `condition_denials` | Redemptions blocked because a condition failed. |
+| `top_reward_granted` | The reward type granted most often. |
+
+## Where the data goes
+
+- **bStats** publishes a public page per plugin, with the charts above rendered as
+  graphs.
+- **FastStats** receives the same definitions through Strata.
+
+Because everything flows through Strata's metrics layer, ProVouchers bundles
+neither library directly, and the single `metrics.enabled` switch governs both.

@@ -17,6 +17,7 @@
     "storage",
     "anti-dupe",
     "config",
+    "metrics",
     "---Developers---",
     "developers",
     "---Help---",
