@@ -82,8 +82,10 @@ rewards:
 
 The value is an item `<reference> [amount]`. The reference is either a vanilla
 material or a `provider:id` custom item (see [Items](/docs/items)). Vanilla
-material names and amounts are validated at load; provider items are resolved at
-redeem time.
+material names are validated at load; provider items are resolved at redeem time.
+The amount may be a literal number or a token such as `{random:1-3}`, which is
+substituted just before the item is given (so `item: GOLD_INGOT {random:1-3}`
+grants 1 to 3 ingots).
 
 The provider keywords are shorthand that fold the provider into the reference:
 
