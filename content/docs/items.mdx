@@ -85,10 +85,10 @@ item:
 ### Requirements
 
 <Callout>
-Custom provider items are resolved through Strata's item hooks. Strata **0.6.2+**
+Custom provider items are resolved through Strata's item hooks. Strata **0.9.0+**
 ships hooks for ItemsAdder, Oraxen, and Nexo, so you only need the provider plugin
 installed and its item to exist. If the reference cannot be resolved (the provider
-plugin is missing, the id is wrong, or Strata is older than 0.6.2), the voucher
+plugin is missing, the id is wrong, or Strata is older than 0.9.0), the voucher
 falls back to its `material` (default `PAPER`). If a custom item shows up as paper,
 check the provider plugin is installed and the id is correct.
 </Callout>
@@ -96,6 +96,58 @@ check the provider plugin is installed and the id is correct.
 This is a deliberate design choice: ProVouchers does not integrate with each
 custom-item plugin directly. It asks Strata, so any provider Strata supports works
 the same way, with no ProVouchers-specific configuration.
+
+## Player heads and custom skulls
+
+A voucher item can be a player head, defined with a `skull:` block instead of (or
+alongside) a material. The head is built through Strata's skull builder, with no
+third-party plugin.
+
+```yaml title="A stable custom head from a base64 texture"
+item:
+  skull:
+    source: texture
+    value: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6..."
+  glow: true
+```
+
+```yaml title="From a Minecraft texture URL"
+item:
+  skull:
+    source: url
+    value: "http://textures.minecraft.net/texture/abc123..."
+```
+
+```yaml title="A specific player's head (by name or UUID)"
+item:
+  skull:
+    source: player        # alias of name
+    value: "Notch"
+```
+
+| `source` | Value | Notes |
+| --- | --- | --- |
+| `texture` (`base64`) | base64 `textures` value | **Stable**, no network. Best for permanent icons. |
+| `url` | a `textures.minecraft.net` URL | **Stable**, no network. |
+| `name` (`player`) | a player name | Resolves the current skin from Mojang (async); the skin can change. |
+| `uuid` | a player UUID | Resolves the current skin from Mojang (async). |
+
+Prefer `texture` or `url` for permanent voucher icons: they need no lookup and do
+not change when a player changes their skin. `name`/`uuid` are resolved
+off-thread and suit dynamic "this player's head" displays. Bad sources and invalid
+UUIDs are caught by `/voucher reload`.
+
+### Heads from Head Database
+
+[Head Database](https://www.spigotmc.org/resources/14280/) heads are custom items,
+so they use the `custom:` field (and the `item:` reward), exactly like ItemsAdder:
+
+```yaml
+item:
+  custom: "headdatabase:7129"   # or hdb:7129
+```
+
+This needs Head Database installed and Strata 0.9.0 or newer.
 
 ## Using provider items as rewards
 
