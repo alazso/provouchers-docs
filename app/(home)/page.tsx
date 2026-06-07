@@ -20,8 +20,8 @@ const features: { title: string; body: string }[] = [
     body: 'Permission, world, region, rank, economy, experience, expiry, gamemode, and owner gates, composed per voucher.',
   },
   {
-    title: 'Preview and give',
-    body: 'A paginated preview GUI, bulk give, and a persisted offline-give queue that delivers on next join.',
+    title: 'Custom items and heads',
+    body: 'Use ItemsAdder, Oraxen, Nexo, or Head Database items, or build player heads from a texture, URL, name, or UUID.',
   },
   {
     title: 'Built on Strata',
@@ -56,11 +56,11 @@ export default function HomePage() {
 
         <h1 className="text-gradient text-5xl font-bold tracking-tight sm:text-6xl">{appName}</h1>
         <p className="mt-4 text-lg font-medium text-fd-foreground sm:text-xl">
-          Vouchers and codes for Paper and Folia, done properly.
+          Item vouchers and redeemable codes for Paper and Folia.
         </p>
         <p className="mt-3 max-w-2xl text-fd-muted-foreground">
-          A config-driven reward and condition system, persistent anti-dupe protection, and a
-          first-class migration path off CrazyVouchers. Built on the Strata shared library.
+          A config-driven reward and condition system, persistent anti-dupe protection, and
+          custom-item support, built on the Strata shared library.
         </p>
 
         <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
