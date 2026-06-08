@@ -23,9 +23,15 @@ storage:
   pool-size: 10
 
 anti-dupe:
+  # Anti-dupe is per voucher (set "stackable: false" on a voucher). These settings
+  # control what happens when a duplicate is caught.
   # When a duplicate voucher is detected on redeem, remove the item instead of
   # returning it to the player.
   remove-on-discovery: true
+  warning:
+    # When a returned duplicate is detected, append a warning line to its lore.
+    enabled: false
+    text: "<red>This item has been duplicated"
 
 metrics:
   # Submit anonymous usage statistics through Strata (bStats and FastStats).
@@ -56,6 +62,8 @@ See [Anti-Dupe and Anti-Exploit](/docs/anti-dupe).
 | Key | Default | Notes |
 | --- | --- | --- |
 | `anti-dupe.remove-on-discovery` | `true` | Remove a duplicate voucher when caught, instead of returning it. |
+| `anti-dupe.warning.enabled` | `false` | Append a warning lore line to a returned duplicate. |
+| `anti-dupe.warning.text` | `<red>This item has been duplicated` | The warning lore line (MiniMessage). |
 
 ## metrics
 

@@ -25,6 +25,7 @@ lore:
 unredeemable: false
 owner-only: false
 has-argument: false
+stackable: true
 cooldown: 0
 expiry: ""
 conditions:
@@ -62,6 +63,7 @@ put in `display-name` and `lore`.
 | `unredeemable` | boolean | `false` | A display-only item that cannot be redeemed (useful for showcases or collectibles). |
 | `owner-only` | boolean | `false` | Only the player it was given to may redeem it. The owner is stamped at give time. |
 | `has-argument` | boolean | `false` | Reserved for a future parametric form. Codes already accept an argument via `/voucher redeem <code> <arg>`. |
+| `stackable` | boolean | `true` | When `true`, items stack and are not dupe-tracked. Set `false` to stamp each item with a unique id for [anti-dupe](/docs/anti-dupe); those items will not stack. |
 
 **Owner-only** stamps the recipient's UUID onto the item when it is given. A
 different player holding the same item is rejected. `provouchers.bypass.owner`

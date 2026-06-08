@@ -4,28 +4,45 @@ description: How ProVouchers stops voucher duplication and common exploits.
 ---
 
 Vouchers are items, and items can be duplicated (creative copies, inventory bugs,
-client exploits). ProVouchers stamps each voucher and verifies it against the
-database on redeem, so a copied voucher cannot be redeemed twice.
+client exploits). ProVouchers can stamp a voucher with a unique id and verify it
+against the database on redeem, so a copied voucher cannot be redeemed twice.
 
-## How stamping works
+Anti-dupe is chosen **per voucher**, because it trades off against stacking.
 
-Every voucher item carries hidden persistent data:
+## Stackable or anti-dupe
 
-- A **batch id**, shared by all items handed out in one give operation, written when
-  the item is created.
-- A **nonce**, unique to a single physical item, assigned lazily the first time a
-  player interacts with the item.
+Each voucher has a `stackable` flag:
 
-The nonce is assigned on first interaction rather than at give time so that a stack
-of vouchers stays stackable until someone actually uses one. When a player redeems,
-the `(batch id, nonce)` pair is checked against the database:
+- **`stackable: true` (the default):** items carry only their voucher id, so they
+  stack freely (within a give and across gives) and are not dupe-tracked.
+- **`stackable: false`:** each item is stamped with its own unique id at give time.
+  On redeem that id is recorded; if an id is seen twice, the second redeem is a
+  duplicate and is rejected. Because a unique id makes every item different, these
+  vouchers **do not stack**.
 
-- **Unseen** means valid: the redemption proceeds and the pair is recorded.
+```yaml title="vouchers/reward.yml"
+id: reward
+item:
+  material: PAPER
+stackable: false   # stamp each item, catch duplicates (these will not stack)
+```
+
+The reason for the trade-off is simple: a dupe glitch makes a byte-for-byte copy of
+an item, so anything unique enough to detect a copy is also unique enough to stop
+the item from stacking. Use `stackable: false` for high-value vouchers, and leave
+the default for everything else.
+
+## How it works
+
+When `stackable: false`, ProVouchers writes a unique id into the item's hidden
+persistent data as it is created. On redeem, the id is checked against the database:
+
+- **Unseen** means valid: the redemption proceeds and the id is recorded.
 - **Already recorded** means duplicate: the redemption is rejected.
 
-Because a duplicated item shares the same nonce as the original, the second redeem
-always resolves as a duplicate. The check runs off the main thread, so it never
-lags the server.
+A duplicated item shares the original's id, so once either is redeemed the other
+resolves as a duplicate. The check runs off the main thread, so it never lags the
+server.
 
 ## Configuration
 
@@ -33,43 +50,49 @@ lags the server.
 anti-dupe:
   # When a duplicate is detected on redeem, remove the item instead of returning it.
   remove-on-discovery: true
+  warning:
+    # When a returned duplicate is detected, append a warning line to its lore.
+    enabled: false
+    text: "<red>This item has been duplicated"
 ```
 
 - `remove-on-discovery: true` (default) destroys a duplicate voucher when it is
   caught, so it cannot be passed around and tried repeatedly.
-- `remove-on-discovery: false` returns the item to the player and simply refuses to
-  redeem it.
+- `remove-on-discovery: false` returns the item to the player and refuses to redeem
+  it. With `warning.enabled: true`, the returned item also gets a lore line marking
+  it as duplicated, which helps against resale scams.
 
 ## Staff alerts
 
-Players (usually staff) with the `provouchers.notify` permission receive a chat
-alert when a duplicate is detected, including who attempted it and which voucher.
+Players with the `provouchers.notify` permission receive a chat alert when a
+duplicate is detected, including who attempted it and which voucher.
 
 ## Built-in exploit guards
 
-In addition to stamping, ProVouchers blocks a few common abuse vectors:
+Independently of the `stackable` choice, ProVouchers blocks a few common abuse
+vectors:
 
 | Guard | Behaviour | Override |
 | --- | --- | --- |
 | Game-mode gate | Creative and spectator cannot redeem | `provouchers.bypass.gamemode` |
 | Item frames | Placing a voucher in an item frame is blocked | (none) |
-| Inventory clones | A cloned item shares its nonce, so the copy resolves as a duplicate | (inherent) |
+| Inventory clones | A cloned anti-dupe item shares its id, so the copy resolves as a duplicate | (inherent) |
 
-The game-mode gate matters because creative lets players middle-click to clone
-items freely. Blocking redemption in creative, combined with the nonce check,
-removes the easy duplication path.
+The game-mode gate matters because creative lets players middle-click to clone items
+freely. Blocking redemption in creative, combined with the id check on anti-dupe
+vouchers, removes the easy duplication path.
 
 ## Networked anti-dupe
 
-If you run several servers, point them all at the same MySQL, MariaDB, or
-PostgreSQL database (see [Storage](/docs/storage)). The stamp records are then
-shared, so a voucher redeemed on one server cannot be redeemed again on another.
+If you run several servers, point them all at the same MySQL, MariaDB, or PostgreSQL
+database (see [Storage](/docs/storage)). The used-id records are then shared, so an
+anti-dupe voucher redeemed on one server cannot be redeemed again on another.
 
 ## Limits to be aware of
 
-- The strongest protection requires a give time and a nonce, both of which are
-  stamped by ProVouchers when it creates the item. Items spawned by other means
-  (for example a raw `/give` of a look-alike) are not ProVouchers vouchers and are
-  ignored.
+- Protection applies only to `stackable: false` vouchers. Stackable vouchers are not
+  dupe-tracked by design.
+- Items spawned by other means (for example a raw `/give` of a look-alike) are not
+  ProVouchers vouchers and are ignored.
 - Anti-dupe protects redemption, not the economy your rewards grant. Pair it with
   sensible cooldowns and use limits.
