@@ -7,7 +7,7 @@ import type { Node, Parent, Literal } from 'unist';
 const PLUGIN_VERSION = process.env.PLUGIN_VERSION || '0.1.0';
 
 // Replaces PLUGIN_VERSION tokens in all text/code nodes before syntax
-// highlighting — keeps snippets copy-pasteable with the real version.
+// highlighting, so snippets stay copy-pasteable with the real version.
 function remarkPluginVersion() {
   return (tree: Node) => {
     const walk = (node: Node) => {
