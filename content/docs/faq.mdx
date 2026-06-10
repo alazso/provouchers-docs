@@ -11,18 +11,16 @@ A plugin that turns rewards into items players hold (vouchers) or words they typ
 (codes), defined in YAML, with anti-dupe protection and a typed reward and
 condition system.
 
-### Do I really need Strata?
+### Does ProVouchers need any other plugin?
 
-Yes. ProVouchers is built on [Strata](https://github.com/alazso/strata) and will not
-enable without it. Install `strata-<version>.jar` into `plugins/` alongside
-ProVouchers. If Strata is missing, the console shows a clear message and ProVouchers
-disables itself cleanly.
+No. ProVouchers is fully self-contained; integrations (Vault, LuckPerms, custom
+items, and so on) are optional and detected automatically when installed. Versions
+before 1.0.0 required the Strata library plugin; that requirement is gone.
 
 ### It says it disabled on startup. Why?
 
-Two reasons cause a clean disable: the server is not on Java 25 / Paper 26.1+, or
-Strata is not installed (or loaded after ProVouchers). The console line tells you
-which.
+A clean disable means the server is not on Java 25 / Paper 26.1+. The console
+line says exactly that.
 
 ### Does it work on Folia?
 
@@ -71,12 +69,11 @@ See [Conditions](/docs/conditions).
 
 ### My custom item shows up as plain paper.
 
-`custom: "itemsadder:..."` is resolved through a Strata item hook. Strata 0.10.0+
-ships hooks for ItemsAdder, Oraxen, and Nexo, so the usual causes are: the provider
-plugin is not installed, the item id is wrong, or Strata is older than 0.10.0. When
-the reference cannot be resolved, the voucher falls back to its `material` (default
-`PAPER`). See [Items](/docs/items). Vanilla `custom-model-data` separately needs a
-resource pack to show.
+`custom: "itemsadder:..."` is resolved through an item hook (ItemsAdder, Oraxen,
+Nexo, Head Database), so the usual causes are: the provider plugin is not
+installed, or the item id is wrong. When the reference cannot be resolved, the
+voucher falls back to its `material` (default `PAPER`). See [Items](/docs/items).
+Vanilla `custom-model-data` separately needs a resource pack to show.
 
 ### How do I give an item with a custom texture?
 

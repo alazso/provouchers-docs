@@ -4,8 +4,8 @@ description: Configure SQLite, MySQL, MariaDB, or PostgreSQL, and understand wha
 ---
 
 ProVouchers persists anti-dupe stamps and code-use counters in a database through
-[Strata](https://github.com/alazso/strata)'s pooled storage. The backend is chosen
-in `config.yml`. The default needs no setup.
+its own pooled storage. The backend is chosen in `config.yml`. The default needs
+no setup.
 
 ## Choosing a backend
 
@@ -29,8 +29,8 @@ storage:
 | `mariadb` | Same as MySQL, MariaDB driver | A MariaDB server and database |
 | `postgres` | Same, PostgreSQL | A PostgreSQL server and database |
 
-The JDBC driver and connection pool are provided by Strata; you do not install or
-shade anything yourself.
+The JDBC drivers and connection pool are fetched by Paper's library loader on
+first start; you do not install anything yourself.
 
 ### SQLite (default)
 

@@ -24,8 +24,8 @@ const features: { title: string; body: string }[] = [
     body: 'Use ItemsAdder, Oraxen, Nexo, or Head Database items, or build player heads from a texture, URL, name, or UUID.',
   },
   {
-    title: 'Built on Strata',
-    body: 'Scheduling, storage, text, hooks, GUIs, and metrics come from the shared Strata library, so the plugin stays lean.',
+    title: 'One self-contained jar',
+    body: 'Scheduling, storage, text, hooks, GUIs, and metrics all ship inside the plugin. No library plugin to install.',
   },
 ];
 
@@ -61,7 +61,7 @@ export default function HomePage() {
         <p className="mt-3 max-w-2xl text-fd-muted-foreground">
           Vouchers and redeemable codes, a config-driven reward and condition system, and
           persistent anti-dupe, with a deep set of integrations built to help your server
-          stand out. Powered by the Strata shared library.
+          stand out. One self-contained plugin.
         </p>
 
         <div className="mt-8 flex flex-wrap items-center justify-center gap-3">

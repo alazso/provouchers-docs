@@ -1,28 +1,19 @@
 ---
 title: Getting Started
-description: Install Strata and ProVouchers, then create, give, and redeem your first voucher.
+description: Install ProVouchers, then create, give, and redeem your first voucher.
 ---
 
 This page takes you from an empty server to a working voucher in a few minutes.
 
-## 1. Install Strata
-
-ProVouchers depends on the [Strata](https://github.com/alazso/strata) shared
-library (version **0.10.0 or newer**), the same install model as Vault or LuckPerms.
-Download `strata-<version>.jar` from the
-[Strata releases](https://github.com/alazso/strata/releases) and drop it into
-`plugins/`. Strata downloads its own runtime libraries (Kotlin runtime, JDBC
-drivers, connection pool) on first start, so you install nothing else.
-
-## 2. Install ProVouchers
+## 1. Install ProVouchers
 
 Download `provouchers-<version>.jar` from the
 [ProVouchers releases](https://github.com/alazso/provouchers/releases), drop it
-into `plugins/`, and restart. On startup ProVouchers checks that Strata is
-present and refuses to enable without it (you will see a clear console message if
-it is missing).
+into `plugins/`, and restart. ProVouchers fetches its runtime libraries (the
+database drivers and connection pool) through Paper's library loader on first
+start, so you install nothing else.
 
-## 3. Find the files
+## 2. Find the files
 
 After the first start, ProVouchers creates this folder:
 
@@ -38,7 +29,7 @@ plugins/ProVouchers/
 Every `vouchers/*.yml` file is one voucher; every `codes/*.yml` file is one code.
 The file name (without `.yml`) is the default id.
 
-## 4. Create a voucher
+## 3. Create a voucher
 
 Make `plugins/ProVouchers/vouchers/starter.yml`:
 
@@ -68,7 +59,7 @@ Then reload:
 `/voucher reload` reports any mistakes per file (with the key and reason), so if
 something is wrong it tells you exactly where.
 
-## 5. Give and redeem it
+## 4. Give and redeem it
 
 ```text
 /voucher give starter 1 Steve
@@ -77,7 +68,7 @@ something is wrong it tells you exactly where.
 Steve holds the item and right-clicks to redeem. (Steve needs the
 `provouchers.use.starter` permission, since the voucher requires it.)
 
-## 6. Try a code
+## 5. Try a code
 
 Make `plugins/ProVouchers/codes/welcome.yml`:
 

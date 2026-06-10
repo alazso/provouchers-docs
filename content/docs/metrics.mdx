@@ -3,10 +3,10 @@ title: Metrics and Telemetry
 description: What ProVouchers reports, why, and how to opt out.
 ---
 
-ProVouchers submits anonymous, aggregate usage statistics through Strata, which
-ships both [bStats](https://bstats.org) and FastStats. The data helps prioritise
-which platforms, integrations, and features to invest in. It is enabled by default
-and can be turned off with a single setting.
+ProVouchers submits anonymous, aggregate usage statistics through
+[bStats](https://bstats.org) and FastStats. The data helps prioritise which
+platforms, integrations, and features to invest in. It is enabled by default and
+can be turned off with a single setting.
 
 <Callout>
 Metrics are **aggregate and non-identifying**. No player names, UUIDs, IP
@@ -67,7 +67,7 @@ never contain anything about *who* redeemed *what*.
 
 - **bStats** publishes a public page per plugin, with the charts above rendered as
   graphs.
-- **FastStats** receives the same definitions through Strata.
+- **FastStats** receives the same definitions.
 
-Because everything flows through Strata's metrics layer, ProVouchers bundles
-neither library directly, and the single `metrics.enabled` switch governs both.
+Each chart is defined once and reported to both backends, and the single
+`metrics.enabled` switch governs both.

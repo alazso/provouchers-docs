@@ -85,22 +85,21 @@ item:
 ### Requirements
 
 <Callout>
-Custom provider items are resolved through Strata's item hooks. Strata **0.10.0+**
-ships hooks for ItemsAdder, Oraxen, and Nexo, so you only need the provider plugin
-installed and its item to exist. If the reference cannot be resolved (the provider
-plugin is missing, the id is wrong, or Strata is older than 0.10.0), the voucher
-falls back to its `material` (default `PAPER`). If a custom item shows up as paper,
-check the provider plugin is installed and the id is correct.
+Custom provider items are resolved through built-in item hooks for ItemsAdder,
+Oraxen, Nexo, and Head Database, so you only need the provider plugin installed
+and its item to exist. If the reference cannot be resolved (the provider plugin is
+missing or the id is wrong), the voucher falls back to its `material` (default
+`PAPER`). If a custom item shows up as paper, check the provider plugin is
+installed and the id is correct.
 </Callout>
 
-This is a deliberate design choice: ProVouchers does not integrate with each
-custom-item plugin directly. It asks Strata, so any provider Strata supports works
-the same way, with no ProVouchers-specific configuration.
+This is a deliberate design choice: support is by capability, so every provider
+works the same way, with no ProVouchers-specific configuration.
 
 ## Player heads and custom skulls
 
 A voucher item can be a player head, defined with a `skull:` block instead of (or
-alongside) a material. The head is built through Strata's skull builder, with no
+alongside) a material. The head is built by ProVouchers itself, with no
 third-party plugin.
 
 ```yaml title="A stable custom head from a base64 texture"
@@ -147,7 +146,7 @@ item:
   custom: "headdatabase:7129"   # or hdb:7129
 ```
 
-This needs Head Database installed and Strata 0.10.0 or newer.
+This needs Head Database installed.
 
 ## Using provider items as rewards
 

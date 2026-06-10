@@ -3,12 +3,11 @@ title: Integrations
 description: Which plugins ProVouchers works with, and how it connects to them.
 ---
 
-ProVouchers integrates with other plugins through
-[Strata](https://github.com/alazso/strata)'s hooks rather than talking to each
-plugin directly. The benefit: support is by **capability**, so any plugin that
-provides a capability (an economy, a permission system, a custom item) works the
-same way, with no ProVouchers-specific configuration. Install the plugin, and the
-matching feature lights up.
+ProVouchers integrates with other plugins through built-in hooks rather than
+talking to each plugin directly. The benefit: support is by **capability**, so any
+plugin that provides a capability (an economy, a permission system, a custom item)
+works the same way, with no ProVouchers-specific configuration. Install the
+plugin, and the matching feature lights up.
 
 ## Economy
 
@@ -58,8 +57,7 @@ conditions:
     groups: [ vip, mvp ]
 ```
 
-Granting a rank or permission as a **reward** is native, backed by LuckPerms
-(Strata 0.10.0+):
+Granting a rank or permission as a **reward** is native, backed by LuckPerms:
 
 ```yaml
 rewards:
@@ -76,7 +74,8 @@ See the [`group`](/docs/rewards#group) and
 Used by the [`custom` item field](/docs/items#custom-provider-items-itemsadder-oraxen-nexo)
 and the [`item` reward](/docs/rewards#item).
 
-ProVouchers references custom items as `provider:id` and asks Strata to build them:
+ProVouchers references custom items as `provider:id` and asks the matching
+provider to build them:
 
 ```yaml
 item:
@@ -86,8 +85,8 @@ rewards:
 ```
 
 <Callout>
-Strata **0.10.0+** ships item hooks for ItemsAdder, Oraxen, and Nexo, so custom
-items work once the provider plugin is installed and the item exists. If a
+ProVouchers ships item hooks for ItemsAdder, Oraxen, Nexo, and Head Database, so
+custom items work once the provider plugin is installed and the item exists. If a
 reference cannot be resolved, an item voucher falls back to its `material` and an
 item reward is skipped and logged.
 </Callout>
@@ -101,17 +100,16 @@ messages, broadcasts, titles, and action bars. See
 [Text and Placeholders](/docs/text). Install PlaceholderAPI and the placeholders
 you reference, and they render automatically.
 
-**MiniPlaceholders** is also supported (Strata 0.10.0+), for component-based,
-MiniMessage-native placeholders. It resolves in the same text alongside
-PlaceholderAPI.
+**MiniPlaceholders** is also supported, for component-based, MiniMessage-native
+placeholders. It resolves in the same text alongside PlaceholderAPI.
 
 ## Regions and claims
 
 Used by the [`region` condition](/docs/conditions#region-worldguard-and-claim-plugins).
 
 Region restrictions (claim only in spawn, deny in PvP zones, and so on) work
-through a region hook. Strata **0.10.0+** ships a WorldGuard provider, so install
-WorldGuard and gate vouchers with `type: region`.
+through a region hook backed by WorldGuard. Install WorldGuard and gate vouchers
+with `type: region`.
 
 ## Everything else
 
@@ -130,8 +128,6 @@ lossy. If `/command %player% ...` does the job cleanly, a command reward is the
 right tool.
 
 ## Summary
-
-Requires Strata **0.10.0 or newer**.
 
 | Capability | Works via | Status |
 | --- | --- | --- |

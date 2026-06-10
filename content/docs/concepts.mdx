@@ -79,16 +79,15 @@ Steps 1 to 7 are instant and on the player's thread. Step 8 touches the database
 so it runs asynchronously, then control returns to the player to grant rewards.
 This keeps the server (and Folia regions) responsive.
 
-## Built on Strata
+## One self-contained plugin
 
-ProVouchers does not re-implement scheduling, storage, text rendering, conditions,
-integrations, or metrics. It uses [Strata](https://github.com/alazso/strata) for
-all of that. Practically, this means:
+Everything ProVouchers needs (scheduling, storage, text rendering, conditions,
+integrations, metrics) ships inside the plugin. Practically, this means:
 
-- **Conditions** (permission, region, economy, and so on) are evaluated by Strata,
-  so they share one consistent config shape (see [Conditions](/docs/conditions)).
-- **Integrations** (economy, permissions, custom items, placeholders) are provided
-  by Strata's hooks, so installing a supported plugin "just works" without
+- **Conditions** (permission, region, economy, and so on) share one consistent
+  config shape (see [Conditions](/docs/conditions)).
+- **Integrations** (economy, permissions, custom items, placeholders) are detected
+  automatically, so installing a supported plugin "just works" without
   ProVouchers-specific setup (see [Integrations](/docs/integrations)).
 - **Text** is rendered with MiniMessage and PlaceholderAPI in one place (see
   [Text and Placeholders](/docs/text)).
