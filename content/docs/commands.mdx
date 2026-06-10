@@ -15,6 +15,7 @@ All commands live under `/voucher`, with the aliases `/pv` and `/vouchers`.
 | `/voucher preview` | `provouchers.preview` | admin | Browse loaded vouchers in a GUI and give yourself a copy. |
 | `/voucher list` | `provouchers.list` | admin | List loaded vouchers and the code count. |
 | `/voucher reload` | `provouchers.reload` | admin | Reload voucher and code files, reporting per-file errors. |
+| `/voucher doctor` | `provouchers.doctor` | admin | Print a diagnostic health report (storage, integrations, content, locale). |
 
 ### give
 
@@ -67,6 +68,18 @@ how a voucher's item, name, and lore actually render before handing it out.
 Reloads every file in `vouchers/` and `codes/`. If a file has a mistake (an unknown
 reward type, a bad material, an invalid expiry, a malformed condition), the reload
 reports it with the file name and the reason, and keeps loading the rest.
+
+### doctor
+
+```text
+/voucher doctor
+```
+
+Prints a quick health report: plugin version and server flavor, the storage backend
+and whether the pool is connected, how many vouchers and codes are loaded, which
+integrations were detected (economy, permissions, item providers, regions), the
+active locale and loaded languages, and whether metrics are on. Use it to confirm a
+fresh install or to diagnose a misconfiguration.
 
 ## Bypass and utility permissions
 

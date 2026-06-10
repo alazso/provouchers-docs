@@ -1,0 +1,56 @@
+---
+title: Localization
+description: Translate ProVouchers messages and serve each player their own language.
+---
+
+Every plugin-generated message (command feedback, redeem errors, condition defaults,
+staff alerts) lives in a language file, so you can translate ProVouchers or reword it
+to match your server's voice. Voucher names, lore, and reward text are not here: those
+are per-voucher and already yours to write (see [Text](/docs/text)).
+
+## How it works
+
+ProVouchers ships English at `lang/en.yml`, written to `plugins/ProVouchers/lang/` on
+first start. Messages are MiniMessage with a `{prefix}` token and message-specific
+placeholders:
+
+```yaml title="lang/en.yml (excerpt)"
+prefix: "<gradient:#FFD700:#FF8A00><b>ProVouchers</b></gradient> <dark_gray>»</dark_gray> "
+redeem:
+  expired: "<red>This voucher has expired."
+  cooldown: "<red>You must wait {seconds}s before redeeming this again."
+```
+
+## Translating
+
+Copy `lang/en.yml` to `lang/<code>.yml` (a Minecraft language code such as `de`, `fr`,
+or `es`), translate the values, and keep the keys and `{placeholders}` unchanged. Then
+either set the active language or rely on per-player detection:
+
+```yaml title="config.yml"
+locale:
+  default: en        # the active/fallback language and the console language
+  per-player: true   # serve each player their client language when a lang file exists
+```
+
+- **`per-player: true`** (default) serves each player the language of their Minecraft
+  client when a matching `lang/<code>.yml` exists, otherwise `default`. Console always
+  uses `default`.
+- **`per-player: false`** serves `default` to everyone.
+
+Any key you leave out of a translation falls back to English, so a partial translation
+never shows a blank line. Editing or adding a `lang/<code>.yml` is picked up by
+`/voucher reload`; changing the `locale` settings needs a restart.
+
+## Per-voucher messages
+
+Some messages can also be set per voucher and override the language file, such as a
+[two-step confirmation](/docs/vouchers#two-step-confirmation) prompt. These still
+support `{prefix}` and their placeholders.
+
+## Tips
+
+- `{prefix}` is itself a key, so rebrand the prefix once and it applies everywhere it
+  is used.
+- Run [`/voucher doctor`](/docs/commands#doctor) to see the active locale and which
+  language files are loaded.

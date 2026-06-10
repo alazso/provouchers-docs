@@ -18,6 +18,7 @@
     "storage",
     "anti-dupe",
     "config",
+    "localization",
     "metrics",
     "---Developers---",
     "developers",

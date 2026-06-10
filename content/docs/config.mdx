@@ -10,6 +10,13 @@ and [Code Reference](/docs/codes)).
 ## The full file
 
 ```yaml title="config.yml"
+locale:
+  # Language for plugin messages. ProVouchers ships English (lang/en.yml); copy it to
+  # lang/<code>.yml (e.g. lang/de.yml) to translate. Missing keys fall back to English.
+  default: en
+  # Serve each player their Minecraft client language when a matching lang file exists.
+  per-player: true
+
 storage:
   # Backend: sqlite | mysql | mariadb | postgres
   # SQLite is file-based and needs no extra setup; the others connect to a server.
@@ -23,8 +30,6 @@ storage:
   pool-size: 10
 
 anti-dupe:
-  # Anti-dupe is per voucher (set "stackable: false" on a voucher). These settings
-  # control what happens when a duplicate is caught.
   # When a duplicate voucher is detected on redeem, remove the item instead of
   # returning it to the player.
   remove-on-discovery: true
@@ -32,12 +37,32 @@ anti-dupe:
     # When a returned duplicate is detected, append a warning line to its lore.
     enabled: false
     text: "<red>This item has been duplicated"
+  notify:
+    # Alert staff (players with provouchers.notify) when a duplicate is caught.
+    enabled: true
+
+redeem:
+  # Left-click a held voucher to preview its rewards in a GUI.
+  left-click-preview: true
+  # When batch-opening a stack, suppress per-item reward feedback and show one summary.
+  batch-open-quiet: true
+  # How many seconds a two-step-authentication confirmation stays valid.
+  confirm-window-seconds: 5
 
 metrics:
   # Submit anonymous usage statistics (bStats and FastStats).
   # Set to false to opt out entirely.
   enabled: true
 ```
+
+## locale
+
+See [Localization](/docs/localization) for translating messages.
+
+| Key | Default | Notes |
+| --- | --- | --- |
+| `locale.default` | `en` | The active language, and the language for console output. Add `lang/<code>.yml` files to translate. |
+| `locale.per-player` | `true` | Serve each player their Minecraft client language when a matching `lang/<code>.yml` exists, otherwise the default. |
 
 ## storage
 
@@ -64,6 +89,15 @@ See [Anti-Dupe and Anti-Exploit](/docs/anti-dupe).
 | `anti-dupe.remove-on-discovery` | `true` | Remove a duplicate voucher when caught, instead of returning it. |
 | `anti-dupe.warning.enabled` | `false` | Append a warning lore line to a returned duplicate. |
 | `anti-dupe.warning.text` | `<red>This item has been duplicated` | The warning lore line (MiniMessage). |
+| `anti-dupe.notify.enabled` | `true` | Alert staff (`provouchers.notify`) when a duplicate is caught. The message is the `staff.duplicate-alert` language key. |
+
+## redeem
+
+| Key | Default | Notes |
+| --- | --- | --- |
+| `redeem.left-click-preview` | `true` | Left-click a held voucher to preview its rewards in a GUI. |
+| `redeem.batch-open-quiet` | `true` | When batch-opening a stack, suppress per-item reward feedback (messages, titles, sounds) and show one summary line. |
+| `redeem.confirm-window-seconds` | `5` | How long a [two-step-authentication](/docs/vouchers#two-step-confirmation) confirmation stays valid. |
 
 ## metrics
 
@@ -77,6 +111,6 @@ is in use and how many vouchers are loaded). They never include player data. See
 
 ## Applying changes
 
-`config.yml` is read on startup. After editing it, restart the server (or reload
-the server) for storage and metrics changes to take effect. Voucher and code files,
-by contrast, are reloaded live with `/voucher reload`.
+`config.yml` is read on startup. After editing it, restart the server for storage,
+locale, and redeem settings to take effect. Voucher and code files, and the language
+files in `lang/`, are reloaded live with `/voucher reload`.

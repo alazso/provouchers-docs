@@ -65,11 +65,39 @@ put in `display-name` and `lore`.
 | `has-argument` | boolean | `false` | Reserved for a future parametric form. Codes already accept an argument via `/voucher redeem <code> <arg>`. |
 | `stackable` | boolean | `true` | When `true`, items stack and are not dupe-tracked. Set `false` to stamp each item with a unique id for [anti-dupe](/docs/anti-dupe); those items will not stack. |
 | `batch-open` | boolean | `false` | Shift-right-click a stack to redeem every item at once. Requires a stackable voucher with no cooldown (a reload error is raised otherwise). |
+| `show-rewards` | boolean | `false` | Append an auto-generated reward summary to the item's lore. See [Reward preview](#reward-preview). |
+| `two-step-authentication` | boolean | `false` | Require a confirming second click before redeeming. See [Two-step confirmation](#two-step-confirmation). |
 
 **Owner-only** stamps the recipient's UUID onto the item when it is given. A
 different player holding the same item is rejected. `provouchers.bypass.owner`
 overrides this. Items given before `owner-only` was enabled (with no owner stamp)
 are not restricted.
+
+## Reward preview
+
+```yaml
+show-rewards: true
+```
+
+Appends a generated reward list to the voucher's lore so players can see what it
+grants: guaranteed loot (items, currency, and ranks) and each random set with its
+chance. Non-loot rewards (commands, messages, sounds) are not shown. Players can also
+left-click a held voucher to open the same preview in a GUI, controlled by
+[`redeem.left-click-preview`](/docs/config#redeem).
+
+## Two-step confirmation
+
+```yaml
+two-step-authentication: true
+two-step-authentication-message: "{prefix}<yellow>Click again to confirm."   # optional
+```
+
+Redeeming then takes two clicks: the first shows a confirmation prompt, and a second
+click on the same voucher within the window
+([`redeem.confirm-window-seconds`](/docs/config#redeem)) completes it. This guards
+costly or irreversible vouchers such as teleports, rank grants, and expensive
+one-time rewards. Set your own prompt with `two-step-authentication-message`, or omit
+it for the translatable default; both support `{prefix}`, `{voucher}`, and `{seconds}`.
 
 ## Cooldown
 

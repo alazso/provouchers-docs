@@ -54,6 +54,9 @@ anti-dupe:
     # When a returned duplicate is detected, append a warning line to its lore.
     enabled: false
     text: "<red>This item has been duplicated"
+  notify:
+    # Alert staff (provouchers.notify) when a duplicate is caught.
+    enabled: true
 ```
 
 - `remove-on-discovery: true` (default) destroys a duplicate voucher when it is
@@ -65,7 +68,9 @@ anti-dupe:
 ## Staff alerts
 
 Players with the `provouchers.notify` permission receive a chat alert when a
-duplicate is detected, including who attempted it and which voucher.
+duplicate is detected, including who attempted it, which voucher, and the world. Turn
+the alert off with `anti-dupe.notify.enabled: false`, or change its wording by editing
+the `staff.duplicate-alert` key in your [language file](/docs/localization).
 
 ## Built-in exploit guards
 
@@ -76,6 +81,7 @@ vectors:
 | --- | --- | --- |
 | Game-mode gate | Creative and spectator cannot redeem | `provouchers.bypass.gamemode` |
 | Item frames | Placing a voucher in an item frame is blocked | (none) |
+| Crafting and stations | A voucher cannot be used as a crafting ingredient or placed into an anvil, grindstone, smithing table, loom, cartography table, stonecutter, or brewing stand | (none) |
 | Inventory clones | A cloned anti-dupe item shares its id, so the copy resolves as a duplicate | (inherent) |
 
 The game-mode gate matters because creative lets players middle-click to clone items
