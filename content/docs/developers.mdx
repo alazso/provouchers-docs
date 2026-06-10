@@ -105,9 +105,12 @@ public void onPreRedeem(VoucherPreRedeemEvent event) {
 public void onRedeem(VoucherRedeemEvent event) {
     getLogger().info(event.getPlayer().getName()
         + " redeemed " + event.getVoucher().id()
-        + " (batch " + event.getBatchId() + ")");
+        + " (uid " + event.getUid() + ")");
 }
 ```
+
+`getUid()` is the item's anti-dupe unique id. It is `null` for a stackable voucher,
+which is not dupe-tracked.
 
 | Event | Cancellable | When |
 | --- | --- | --- |
@@ -125,5 +128,5 @@ through your own scheduler rather than assuming the main thread.
 ## Stability
 
 The API is annotated with `@ApiStatus.AvailableSince("0.4.0")`, and the read-only
-types are `@ApiStatus.NonExtendable`. While ProVouchers is in the `0.x` series the
-surface may change between minor releases; it stabilises at `1.0.0`.
+types are `@ApiStatus.NonExtendable`. As of the `1.0.0` release the API surface is
+stable; changes follow semantic versioning.

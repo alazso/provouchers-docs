@@ -69,7 +69,7 @@ ProVouchers keeps a small, indexed schema (tables are prefixed `provouchers_`):
 
 | Table | Holds |
 | --- | --- |
-| `provouchers_redeemed_stamps` | One row per redeemed voucher item, keyed by its batch and nonce. Powers anti-dupe. |
+| `provouchers_used_vouchers` | One row per redeemed anti-dupe voucher item, keyed by its unique id. Powers anti-dupe. |
 | `provouchers_code_uses` | Per-player redemption counts for codes. Powers `uses-per-player` and `max-uses`. |
 | `provouchers_cooldowns` | Per-player, per-voucher cooldown expiry. Survives restarts; loaded on join. |
 | `provouchers_offline_gives` | Reserved for the planned offline-give queue. |

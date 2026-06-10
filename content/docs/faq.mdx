@@ -170,9 +170,10 @@ right-clicked, useful for collectibles or showcases.
 
 ### Can players duplicate vouchers?
 
-A duplicated voucher shares the original's nonce, so the copy resolves as a
-duplicate on redeem and is rejected. Creative redemption is blocked by default and
-item frames are denied. See [Anti-Dupe](/docs/anti-dupe).
+An anti-dupe voucher (`stackable: false`) stamps each item with a unique id, so a
+copied item shares that id and is rejected as a duplicate on redeem. Stackable
+vouchers (the default) are not dupe-tracked. Creative redemption is blocked by
+default and item frames are denied. See [Anti-Dupe](/docs/anti-dupe).
 
 ### Why can't I redeem a voucher in creative?
 

@@ -87,10 +87,11 @@ item:
 <Callout>
 Custom provider items are resolved through built-in item hooks for ItemsAdder,
 Oraxen, Nexo, and Head Database, so you only need the provider plugin installed
-and its item to exist. If the reference cannot be resolved (the provider plugin is
-missing or the id is wrong), the voucher falls back to its `material` (default
-`PAPER`). If a custom item shows up as paper, check the provider plugin is
-installed and the id is correct.
+and its item to exist. An unknown provider name (anything other than `itemsadder`,
+`oraxen`, `nexo`, or `headdatabase`) is reported by `/voucher reload` rather than
+silently ignored. If a known provider's plugin is missing or the id is wrong, the
+voucher falls back to its `material` (default `PAPER`), so if a custom item shows
+up as paper, check the provider plugin is installed and the id is correct.
 </Callout>
 
 This is a deliberate design choice: support is by capability, so every provider
@@ -167,3 +168,9 @@ Per-item details such as dyes, trims, banner patterns, and stored enchantments a
 not yet expressed as config keys. For those, use a provider item (ItemsAdder,
 Oraxen, Nexo) which already encodes the full item, or give the item through a
 `command:` reward.
+
+ProVouchers can also store a fully serialized item: a `serialized:` reference that
+captures every detail of a real item (enchantments, name, lore, model data,
+attributes, and other components) exactly. The in-game command to capture a held
+item into one is planned for a later release, so for now a provider item or a
+`command:` reward is the practical route to a fully custom item.

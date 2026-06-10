@@ -12,6 +12,7 @@ All commands live under `/voucher`, with the aliases `/pv` and `/vouchers`.
 | `/voucher give <id> [amount] [player]` | `provouchers.give` | admin | Give a voucher to yourself or another player. |
 | `/voucher giveall <id> [amount]` | `provouchers.giveall` | admin | Give a voucher to every online player. |
 | `/voucher redeem <code> [arg]` | `provouchers.redeem` | player | Redeem a typeable code. |
+| `/voucher preview` | `provouchers.preview` | admin | Browse loaded vouchers in a GUI and give yourself a copy. |
 | `/voucher list` | `provouchers.list` | admin | List loaded vouchers and the code count. |
 | `/voucher reload` | `provouchers.reload` | admin | Reload voucher and code files, reporting per-file errors. |
 
@@ -24,8 +25,9 @@ All commands live under `/voucher`, with the aliases `/pv` and `/vouchers`.
 ```
 
 When the player argument is omitted, the voucher goes to the command sender.
-Running `give` from the console requires naming a player. The voucher stacks until
-a player interacts with it; see [Anti-Dupe](/docs/anti-dupe) for why.
+Running `give` from the console requires naming a player. By default vouchers stack;
+a voucher set to `stackable: false` is stamped per item and does not stack (see
+[Anti-Dupe](/docs/anti-dupe)).
 
 ### giveall
 
@@ -45,6 +47,16 @@ included (an offline delivery queue is planned but not yet active).
 
 Players use this for codes. The code must be typed exactly, honouring
 `case-sensitive` when the code sets it.
+
+### preview
+
+```text
+/voucher preview
+```
+
+Opens a paginated GUI listing every loaded voucher. Right-click a voucher to give
+yourself a copy, or left-click it for a per-voucher info menu. Handy for checking
+how a voucher's item, name, and lore actually render before handing it out.
 
 ### reload
 
