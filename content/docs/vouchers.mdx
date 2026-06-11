@@ -95,20 +95,16 @@ it for the translatable default; both support `{prefix}`, `{voucher}`, and `{sec
 
 ## Redeem effects
 
-Play a sound and/or a particle to the player on a successful redeem:
+Play a sound to the player on a successful redeem:
 
 ```yaml
 effects:
   sound: "minecraft:entity.player.levelup 1 1"   # key [volume] [pitch]
-  particle: TOTEM_OF_UNDYING                      # a Bukkit particle name
 ```
 
-Both keys are optional. `sound` is a namespaced key followed by an optional volume
-and pitch (each defaults to `1`). `particle` is a
-[Bukkit particle name](https://jd.papermc.io/paper/dev/org/bukkit/Particle.html),
-validated by `/voucher reload`; choose one that needs no extra data (`FLAME`,
-`HEART`, `TOTEM_OF_UNDYING`, `HAPPY_VILLAGER`, and so on). Batch-open redemptions
-stay silent, so opening a whole stack does not spam the effects.
+`sound` is a namespaced key followed by an optional volume and pitch (each defaults
+to `1`). Batch-open redemptions stay silent, so opening a whole stack does not spam
+the sound.
 
 ## Cooldown
 
