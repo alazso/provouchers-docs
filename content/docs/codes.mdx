@@ -54,7 +54,7 @@ Both are checked together, off the main thread, before any reward runs.
 ## Arguments
 
 With `has-argument: true`, players pass a value that rewards can use through the
-`%arg%` token:
+`%arg%` placeholder:
 
 ```yaml title="codes/referral.yml"
 code: REFER
@@ -69,7 +69,7 @@ rewards:
 ```
 
 The `%arg%` is substituted into rewards and messages before MiniMessage is
-rendered. See [Rewards](/docs/rewards#tokens) for the full token list.
+rendered. See [Rewards](/docs/rewards#placeholders) for the full placeholder list.
 
 ## Expiry
 
