@@ -116,16 +116,23 @@ survive restarts. On a network sharing one database (see
 
 ```yaml
 expiry: ""                       # never expires (default)
-expiry: "2026-12-31T23:59:59Z"   # absolute: a fixed moment (ISO-8601)
+expiry: "2026-12-31"             # a plain date: end of that day (server time zone)
+expiry: "2026-12-31T23:59:59"    # a local date-time (server time zone)
+expiry: "2026-12-31T23:59:59Z"   # a full ISO-8601 instant (explicit zone)
 expiry: "30d"                    # relative: 30 days after the item was given
 ```
 
-`expiry` accepts three forms:
+`expiry` accepts:
 
 - **Empty** means the voucher never expires.
-- An **ISO-8601 instant** is a fixed moment in time, the same for every copy.
-- A **relative duration** (`30d`, `12h`, `90m`, `45s`) is measured from the moment
-  the item was given, so a `"30d"` voucher given today stops working in 30 days.
+- A **plain date** (`2026-12-31`) expires at the end of that day in the server's time
+  zone, so the voucher is usable for the whole date.
+- A **local date-time** (`2026-12-31T23:59:59`) is that exact moment in the server's
+  time zone.
+- A **full ISO-8601 instant** (`2026-12-31T23:59:59Z`) is a fixed moment with an
+  explicit zone, the same everywhere.
+- A **relative duration** (`30d`, `12h`, `90m`, `45s`) is measured from the moment the
+  item was given, so a `"30d"` voucher given today stops working in 30 days.
 
 The give time is stamped onto each item, so relative expiry is per-item. Bad
 expiry values are caught by `/voucher reload`, not at redeem time.
