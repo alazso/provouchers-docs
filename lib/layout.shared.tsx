@@ -10,7 +10,7 @@ export function baseOptions(): BaseLayoutProps {
     links: [
       { text: 'Docs', url: '/docs' },
       { text: 'Getting Started', url: '/docs/getting-started' },
-      { text: 'Maven', url: 'https://repo.alaz.so' },
+      { text: 'Download', url: 'https://modrinth.com/plugin/provouchers' },
     ],
     githubUrl: `https://github.com/${gitConfig.user}/${gitConfig.repo}`,
   };
