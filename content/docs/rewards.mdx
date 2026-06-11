@@ -163,6 +163,10 @@ reward value:
 | `%player%` | The redeeming player's name |
 | `%arg%` | The argument from `/voucher redeem <code> <arg>` (codes with `has-argument`) |
 | `%random:min-max%` | A random integer in the inclusive range |
+| `%random:min-max:name%` | A **named** roll: the same name resolves to one shared value per redeem |
+
+(`%expiry%` is also available, but only in a voucher's display name and lore: see
+[Vouchers](/docs/vouchers#expiry).)
 
 The curly-brace forms (`{player}`, `{arg}`, `{random:min-max}`) are deprecated but
 still work; `/voucher reload` warns when a file uses them.
@@ -172,6 +176,22 @@ rewards:
   - "command: give %player% gold_ingot %random:1-3%"
   - "broadcast: <gold>%player% won %random:100-1000% coins!"
 ```
+
+### Named random: give exactly what you announce
+
+A plain `%random:min-max%` rolls a fresh value every time it appears. Add a name
+(`%random:min-max:name%`) and the **first** occurrence in a redeem rolls once; every
+later use of that same name reuses the value. This lets one reward give an amount and
+another announce the very same amount:
+
+```yaml
+rewards:
+  - "currency: give %random:100-500:coins%"
+  - "broadcast: <gold>%player% won %random:100-500:coins% coins!"   # same number
+```
+
+Each distinct name has its own value, and unnamed rolls stay independent. The value
+is cached only for the duration of a single redeem.
 
 `%player%` and PlaceholderAPI placeholders (`%vault_eco_balance%`, and so on)
 both work; see [Text and Placeholders](/docs/text) for the resolution order.

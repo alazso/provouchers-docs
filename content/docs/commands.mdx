@@ -14,7 +14,7 @@ All commands live under `/voucher`, with the aliases `/pv` and `/vouchers`.
 | `/voucher redeem <code> [arg]` | `provouchers.redeem` | player | Redeem a typeable code. |
 | `/voucher preview` | `provouchers.preview` | admin | Browse loaded vouchers in a GUI and give yourself a copy. |
 | `/voucher list` | `provouchers.list` | admin | List loaded vouchers and the code count. |
-| `/voucher reload` | `provouchers.reload` | admin | Reload voucher and code files, reporting per-file errors. |
+| `/voucher reload [id]` | `provouchers.reload` | admin | Reload all voucher and code files, or just one by id, reporting per-file errors. |
 | `/voucher doctor` | `provouchers.doctor` | admin | Print a diagnostic health report (storage, integrations, content, locale). |
 
 ### give
@@ -62,12 +62,19 @@ how a voucher's item, name, and lore actually render before handing it out.
 ### reload
 
 ```text
-/voucher reload
+/voucher reload          # everything
+/voucher reload <id>     # one file
 ```
 
 Reloads every file in `vouchers/` and `codes/`. If a file has a mistake (an unknown
 reward type, a bad material, an invalid expiry, a malformed condition), the reload
 reports it with the file name and the reason, and keeps loading the rest.
+
+Pass an `id` to reload only the `vouchers/<id>.yml` and/or `codes/<id>.yml` file by
+that name, leaving every other loaded entry in place. This is handy for quick edits
+on a busy server. The id tab-completes from the loaded vouchers. A file that now
+fails to parse keeps its previously loaded version, so a typo never drops a working
+voucher.
 
 ### doctor
 

@@ -1,0 +1,139 @@
+---
+title: Condition Cookbook
+description: Ready-to-use recipes that compose multiple conditions into real gating rules.
+---
+
+The [Conditions](/docs/conditions) page documents each `type` on its own. This page
+is the opposite view: practical recipes that **stack several conditions** to express
+a real rule. Every condition in the list must pass, and the **first** failing one
+shows its message and stops the redemption, so the order you list them in is the
+order they are checked.
+
+## How composition works
+
+A `conditions:` list is an implicit **AND**: the redemption is allowed only when every
+entry passes.
+
+```yaml
+conditions:
+  - type: world
+    worlds: [ event_world ]
+    deny: "<red>Redeem this at the event."
+  - type: rank
+    groups: [ vip ]
+    deny: "<red>VIPs only."
+```
+
+Two rules of thumb:
+
+- **Order from broad to specific.** Checking is top-down and stops at the first
+  failure, so put the cheap, common gate (world, permission) before the specific or
+  hook-backed one (region, papi). The player then sees the most relevant message.
+- **There is no `OR`.** To allow *either* of two groups, use the list form of a single
+  condition (`groups: [ vip, mvp ]`), not two `rank` entries. Two entries mean *both*.
+
+## Recipes
+
+### VIP-only event in one world
+
+A reward that only VIPs can claim, and only inside the event world.
+
+```yaml
+conditions:
+  - type: world
+    worlds: [ event_world ]
+    deny: "<red>This can only be redeemed at the event."
+  - type: rank
+    groups: [ vip, mvp ]
+    deny: "<red>VIP or MVP rank required."
+```
+
+### Skill-and-cost gate
+
+Require both a level and a balance before a powerful reward. Remember `economy` only
+**checks** the balance; pair it with a [`currency: take`](/docs/rewards#currency)
+reward if you also want to charge.
+
+```yaml
+conditions:
+  - type: exp
+    level: 30
+    deny: "<red>Reach level 30 first."
+  - type: economy
+    amount: 5000
+    deny: "<red>You need $5000 to redeem this."
+rewards:
+  - "currency: take 5000"
+  - "command: lp user %player% parent addtemp prestige 7d"
+```
+
+### Redeem at spawn, members only
+
+Combine a region gate with a rank gate so a claim works only at spawn and only for
+members. Both are hook-backed and **fail closed** when their plugin is missing.
+
+```yaml
+conditions:
+  - type: region
+    regions: [ spawn ]
+    deny: "<red>Come to spawn to claim this."
+  - type: rank
+    groups: [ member ]
+    deny: "<red>Members only."
+```
+
+### Time-limited launch reward
+
+Gate a launch crate behind a permission and a hard cutoff date. The `expiry`
+condition stops the redeem after the instant, independent of any per-item
+[voucher expiry](/docs/vouchers#expiry).
+
+```yaml
+conditions:
+  - type: permission
+    permission: "provouchers.use.launch"
+    deny: "<red>You have not unlocked the launch reward."
+  - type: expiry
+    expires: "2026-07-01T00:00:00Z"
+    deny: "<yellow>The launch event has ended."
+```
+
+### Quest-stage gate via PlaceholderAPI
+
+Allow a redeem only when another plugin reports the right state, using a
+[`papi`](/docs/conditions#placeholderapi-comparison) comparison.
+
+```yaml
+conditions:
+  - type: papi
+    placeholder: "%quests_stage_dragon%"
+    operator: ">="
+    value: "5"
+    deny: "<red>Finish the dragon quest first."
+```
+
+### Survival-only, not in creative
+
+Restrict a reward to genuine survival play. The built-in gate already blocks creative
+and spectator, but an explicit `gamemode` list also blocks adventure if you want only
+survival.
+
+```yaml
+conditions:
+  - type: gamemode
+    gamemodes: [ survival ]
+    deny: "<red>Switch to survival to redeem this."
+```
+
+## Choosing the order
+
+Because the first failure wins, list conditions so the message a player is most likely
+to hit comes first. For the VIP event recipe, most players are simply in the wrong
+world, so the `world` gate leads; the rank gate is the rarer, more specific failure and
+comes second. When two gates are equally likely, lead with the cheaper one (a plain
+`permission` or `world` check) before a hook-backed `region`, `economy`, or `papi`
+lookup.
+
+See [Conditions](/docs/conditions) for the full type reference and
+[Core Concepts](/docs/concepts#how-a-redemption-flows) for where conditions sit in the
+redemption flow.

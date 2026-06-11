@@ -5,8 +5,8 @@ description: Depend on ProVouchers, query vouchers, and react to redemptions.
 
 ProVouchers ships a small, interface-only API (`so.alaz.provouchers.api`) for other
 plugins: a service to query and give vouchers, and events to veto or observe
-redemptions. It is available since **0.4.0** and, while ProVouchers is pre-1.0, may
-change between minor versions.
+redemptions. It has been available since **0.4.0**, and from the **1.0.0** release the
+surface is stable and follows semantic versioning.
 
 ## Depend on the API
 
@@ -20,7 +20,7 @@ repositories {
 }
 
 dependencies {
-    compileOnly("so.alaz.provouchers:provouchers-api:0.4.0")
+    compileOnly("so.alaz.provouchers:provouchers-api:1.0.0")
 }
 ```
 
@@ -33,7 +33,7 @@ dependencies {
 <dependency>
   <groupId>so.alaz.provouchers</groupId>
   <artifactId>provouchers-api</artifactId>
-  <version>0.4.0</version>
+  <version>1.0.0</version>
   <scope>provided</scope>
 </dependency>
 ```
@@ -124,6 +124,75 @@ These events fire on the redeeming player's region thread, not necessarily the
 global main thread. Keep handlers Folia-safe: schedule any cross-region work
 through your own scheduler rather than assuming the main thread.
 </Callout>
+
+## A complete consumer plugin
+
+A small but complete example that ties the pieces together: it resolves the service
+on enable, gives a welcome voucher when a player first joins, and rewards a token of
+its own whenever any voucher is redeemed.
+
+```java title="VoucherRewardsPlugin.java"
+package com.example.voucherrewards;
+
+import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.plugin.java.JavaPlugin;
+import so.alaz.provouchers.api.VoucherService;
+import so.alaz.provouchers.api.event.VoucherRedeemEvent;
+
+public final class VoucherRewardsPlugin extends JavaPlugin implements Listener {
+
+    private VoucherService vouchers;
+
+    @Override
+    public void onEnable() {
+        // ProVouchers registers the service on enable; load BEFORE in paper-plugin.yml
+        // guarantees it is present by the time we run.
+        vouchers = getServer().getServicesManager().load(VoucherService.class);
+        if (vouchers == null) {
+            getLogger().warning("ProVouchers not found; voucher features disabled.");
+            return;
+        }
+        getLogger().info("Hooked ProVouchers: " + vouchers.voucherCount() + " vouchers loaded.");
+        getServer().getPluginManager().registerEvents(this, this);
+    }
+
+    @EventHandler
+    public void onJoin(PlayerJoinEvent event) {
+        Player player = event.getPlayer();
+        if (vouchers != null && !player.hasPlayedBefore()) {
+            // give(...) is async and Folia-safe; it returns false if the id is not loaded.
+            vouchers.give(player, "welcome_crate", 1);
+        }
+    }
+
+    @EventHandler
+    public void onRedeem(VoucherRedeemEvent event) {
+        // Fires on the player's region thread, after the redeem has committed.
+        getLogger().info(event.getPlayer().getName()
+            + " redeemed " + event.getVoucher().id());
+        // ... award loyalty points, update a scoreboard, etc.
+    }
+}
+```
+
+```yaml title="paper-plugin.yml"
+name: VoucherRewards
+version: 1.0.0
+main: com.example.voucherrewards.VoucherRewardsPlugin
+api-version: "1.21"
+dependencies:
+  server:
+    ProVouchers:
+      load: BEFORE
+      required: false   # soft integration: we degrade gracefully when it is absent
+```
+
+With `required: false`, guard every use with the `vouchers != null` check shown above
+so your plugin still loads when ProVouchers is not installed. Use `required: true` if
+ProVouchers is mandatory and you would rather fail fast.
 
 ## Stability
 
