@@ -78,11 +78,13 @@ dynamic values.
 ## ProVouchers tokens vs placeholders
 
 ProVouchers also substitutes a few [tokens](/docs/rewards#tokens) (`%player%`,
-`{player}`, `{arg}`, `{random:min-max}`) before MiniMessage. These are always
-available, even without PlaceholderAPI, and resolve everywhere text is rendered,
-including a voucher's display name and lore, not only rewards and messages. `{arg}`
-only has a value when redeeming a code with an argument, so it is blank in voucher
-names and lore.
+`%arg%`, `%random:min-max%`) before MiniMessage. These are always available, even
+without PlaceholderAPI, and resolve everywhere text is rendered, including a voucher's
+display name and lore, not only rewards and messages. `%arg%` only has a value when
+redeeming a code with an argument, so it is blank in voucher names and lore.
+
+The older curly-brace forms (`{player}`, `{arg}`, `{random:min-max}`) still work but
+are deprecated; `/voucher reload` warns when a voucher or code file uses them.
 
 ## When there is no resource pack
 

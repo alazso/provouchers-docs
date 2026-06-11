@@ -37,7 +37,7 @@ rewards:
 | `conditions` | list | empty | See [Conditions](/docs/conditions). |
 | `rewards` | list | empty | See [Rewards](/docs/rewards). |
 | `random-rewards` | list | empty | Weighted "pick one" rewards. |
-| `has-argument` | boolean | `false` | Accept a trailing argument, exposed to rewards as `{arg}`. |
+| `has-argument` | boolean | `false` | Accept a trailing argument, exposed to rewards as `%arg%`. |
 
 ## Use limits
 
@@ -54,13 +54,13 @@ Both are checked together, off the main thread, before any reward runs.
 ## Arguments
 
 With `has-argument: true`, players pass a value that rewards can use through the
-`{arg}` token:
+`%arg%` token:
 
 ```yaml title="codes/referral.yml"
 code: REFER
 has-argument: true
 rewards:
-  - "broadcast: <green>%player% was referred by {arg}!"
+  - "broadcast: <green>%player% was referred by %arg%!"
   - "currency: give 100"
 ```
 
@@ -68,7 +68,7 @@ rewards:
 /voucher redeem REFER Steve
 ```
 
-The `{arg}` is substituted into rewards and messages before MiniMessage is
+The `%arg%` is substituted into rewards and messages before MiniMessage is
 rendered. See [Rewards](/docs/rewards#tokens) for the full token list.
 
 ## Expiry
