@@ -95,16 +95,51 @@ it for the translatable default; both support `{prefix}`, `{voucher}`, and `{sec
 
 ## Redeem effects
 
-Play a sound to the player on a successful redeem:
+Play a sound and/or a firework on a successful redeem:
 
 ```yaml
 effects:
   sound: "minecraft:entity.player.levelup 1 1"   # key [volume] [pitch]
+  firework:
+    colors: [ YELLOW, "#FF8A00" ]   # named colors or #RRGGBB hex
+    fade: [ RED ]                   # optional fade colors
+    type: BALL                      # BALL | BALL_LARGE | STAR | BURST | CREEPER
+    power: 0                        # 0 detonates at the player, up to 2 to fly
 ```
 
 `sound` is a namespaced key followed by an optional volume and pitch (each defaults
-to `1`). Batch-open redemptions stay silent, so opening a whole stack does not spam
-the sound.
+to `1`). The firework never deals damage. Batch-open redemptions stay silent, so
+opening a whole stack does not spam the effects.
+
+## Use limits
+
+```yaml
+max-uses: 100        # global cap across all players (-1 = unlimited)
+uses-per-player: 1   # lifetime redemptions per player (-1 = unlimited)
+```
+
+Counters persist in the database and, on a shared database, apply across the
+network. Batch open caps at the remaining allowance and refunds the rest of the
+stack. `/voucher resetuses <id> [player]` clears the counters; admins need this
+when reconfiguring a capped voucher.
+
+## Defined items
+
+Define decorated items once and grant them from any reward line with `@<name>`:
+
+```yaml
+items:
+  vip_sword:
+    material: DIAMOND_SWORD       # or custom:/skull:, same keys as item:
+    name: "<gold>Excalibur"
+    lore: ["<gray>A legendary blade."]
+    glow: true
+rewards:
+  - "item: @vip_sword 1"
+```
+
+A reference to an undefined name fails at `/voucher reload`, not at redeem time.
+Codes support the same `items:` map.
 
 ## Cooldown
 
@@ -113,7 +148,8 @@ cooldown: 86400   # seconds; 24 hours
 ```
 
 A per-player, per-voucher cooldown in seconds. `0` (the default) means no
-cooldown. `provouchers.bypass.cooldown` ignores it.
+cooldown. `provouchers.bypass.cooldown` ignores it, and
+[cooldown tiers](/docs/config#cooldown-tiers) can shorten it per permission.
 
 Cooldowns are persisted to the database and reloaded when a player joins, so they
 survive restarts. On a network sharing one database (see
@@ -143,6 +179,11 @@ expiry: "30d"                    # relative: 30 days after the item was given
 
 The give time is stamped onto each item, so relative expiry is per-item. Bad
 expiry values are caught by `/voucher reload`, not at redeem time.
+
+The opposite gate also exists: `active-from: "2026-07-01"` refuses redemption
+before that moment. It accepts a plain date (active from the START of that day),
+a date-time, or an ISO-8601 instant; relative durations are rejected since a
+start gate has no give-time anchor. Works on codes too.
 
 Put `%expiry%` in the `display-name` or `lore` to show it on the item. It renders
 as `in 30d` for a relative duration, `on 2026-12-31` for an absolute date, or

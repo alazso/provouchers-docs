@@ -99,6 +99,21 @@ See [Anti-Dupe and Anti-Exploit](/docs/anti-dupe).
 | `redeem.batch-open-quiet` | `true` | When batch-opening a stack, suppress per-item reward feedback (messages, titles, sounds) and show one summary line. |
 | `redeem.confirm-window-seconds` | `5` | How long a [two-step-authentication](/docs/vouchers#two-step-confirmation) confirmation stays valid. |
 
+## Cooldown tiers
+
+Permission-based multipliers applied to every voucher cooldown:
+
+```yaml
+cooldown:
+  tiers:
+    vip: 0.5    # provouchers.cooldown.vip halves cooldowns
+    mvp: 0.0    # provouchers.cooldown.mvp removes them
+```
+
+A player holding several tiers gets the lowest multiplier. Read once at startup;
+changing tiers needs a restart. `provouchers.bypass.cooldown` still skips
+cooldowns entirely.
+
 ## metrics
 
 | Key | Default | Notes |

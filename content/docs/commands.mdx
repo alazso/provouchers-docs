@@ -15,6 +15,8 @@ All commands live under `/voucher`, with the aliases `/pv` and `/vouchers`.
 | `/voucher preview` | `provouchers.preview` | admin | Browse loaded vouchers in a GUI and give yourself a copy. |
 | `/voucher list` | `provouchers.list` | admin | List loaded vouchers and the code count. |
 | `/voucher reload [id]` | `provouchers.reload` | admin | Reload all voucher and code files, or just one by id, reporting per-file errors. |
+| `/voucher resetuses <id> [player]` | `provouchers.resetuses` | admin | Clear the recorded use counters for a voucher or code, for one player or everyone. |
+| `/voucher fromhand <id>` | `provouchers.fromhand` | admin | Capture the held item as a new voucher file, behind a confirm GUI. |
 | `/voucher doctor` | `provouchers.doctor` | admin | Print a diagnostic health report (storage, integrations, content, locale). |
 
 ### give
@@ -75,6 +77,28 @@ that name, leaving every other loaded entry in place. This is handy for quick ed
 on a busy server. The id tab-completes from the loaded vouchers. A file that now
 fails to parse keeps its previously loaded version, so a typo never drops a working
 voucher.
+
+### resetuses
+
+```text
+/voucher resetuses <id>           # everyone
+/voucher resetuses <id> <player>  # one player
+```
+
+Clears the persistent use counters behind `max-uses` and `uses-per-player` (and a
+code's use limits). Run it after reconfiguring a capped voucher, or to let a
+specific player redeem again.
+
+### fromhand
+
+```text
+/voucher fromhand <id>
+```
+
+Captures the item in your main hand as a new voucher: a confirm GUI shows the item
+rebuilt from its serialized form (exactly what the voucher will give, full
+fidelity), and confirming writes `vouchers/<id>.yml` and loads it immediately.
+Cancelling or closing the menu writes nothing.
 
 ### doctor
 

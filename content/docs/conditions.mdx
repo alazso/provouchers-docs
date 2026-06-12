@@ -42,6 +42,9 @@ If you omit `deny`, a generic failure message is shown.
 | `region` | `regions` (list) | The player is standing in one of these regions | a region hook |
 | `papi` | `placeholder`, `operator`, `value` | The compared PlaceholderAPI output matches | PlaceholderAPI |
 | `playerstat` | `statistic`, `operator`, `value` | The compared statistic matches | nothing |
+| `playtime` | `time` | Total playtime is at least this duration (`"2h"`, `"30m"`) | nothing |
+| `item` | `material`, `amount` | The inventory holds at least this many of the material | nothing |
+| `advancement` | `advancement` | The player completed this advancement key | nothing |
 
 <Callout>
 Hook-backed conditions (`economy`, `rank`, `region`) **deny gracefully** when their
@@ -124,6 +127,25 @@ conditions:
 
 `operator` is one of `==`, `!=`, `>`, `>=`, `<`, `<=`. Numeric comparisons are used
 when both sides are numbers, otherwise string equality.
+
+### Playtime, items, and advancements
+
+```yaml
+conditions:
+  - type: playtime
+    time: "10h"
+    deny: "<red>Play 10 hours first."
+  - type: item
+    material: DIAMOND
+    amount: 3
+    deny: "<red>Bring 3 diamonds."
+  - type: advancement
+    advancement: "minecraft:story/mine_diamond"
+    deny: "<red>Mine a diamond first."
+```
+
+`item` only checks the inventory; it never takes the items. `advancement` takes a
+namespaced key; an unknown key denies rather than passing.
 
 ## How this differs from the built-in gates
 
