@@ -121,7 +121,8 @@ uses-per-player: 1   # lifetime redemptions per player (-1 = unlimited)
 Counters persist in the database and, on a shared database, apply across the
 network. Batch open caps at the remaining allowance and refunds the rest of the
 stack. `/voucher resetuses <id> [player]` clears the counters; admins need this
-when reconfiguring a capped voucher.
+when reconfiguring a capped voucher. Ids longer than 56 characters cannot use
+limits (the counter column bounds the key); the file is rejected at reload.
 
 ## Defined items
 
