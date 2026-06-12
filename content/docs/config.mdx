@@ -98,6 +98,20 @@ See [Anti-Dupe and Anti-Exploit](/docs/anti-dupe).
 | `redeem.left-click-preview` | `true` | Left-click a held voucher to preview its rewards in a GUI. |
 | `redeem.batch-open-quiet` | `true` | When batch-opening a stack, suppress per-item reward feedback (messages, titles, sounds) and show one summary line. |
 | `redeem.confirm-window-seconds` | `5` | How long a [two-step-authentication](/docs/vouchers#two-step-confirmation) confirmation stays valid. |
+| `redeem.confirm-style` | `chat` | How the confirmation is asked: `chat` (click again after a prompt) or `gui` (a confirm/cancel menu showing the voucher). |
+
+## Auto-give
+
+Give vouchers automatically to first-time joiners:
+
+```yaml
+auto-give:
+  first-join:
+    - welcome_crate
+```
+
+Ids resolve at join time, so `/voucher reload` fixes a typo without a restart;
+enabling or disabling the section itself needs one. An unknown id is logged.
 
 ## Cooldown tiers
 

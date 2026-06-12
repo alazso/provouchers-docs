@@ -10,12 +10,13 @@ All commands live under `/voucher`, with the aliases `/pv` and `/vouchers`.
 | Command | Permission | Role | Description |
 | --- | --- | --- | --- |
 | `/voucher give <id> [amount] [player]` | `provouchers.give` | admin | Give a voucher to yourself or another player. |
-| `/voucher giveall <id> [amount]` | `provouchers.giveall` | admin | Give a voucher to every online player. |
+| `/voucher giveall <id> [amount] [permission]` | `provouchers.giveall` | admin | Give a voucher to every online player. |
 | `/voucher redeem <code> [arg]` | `provouchers.redeem` | player | Redeem a typeable code. |
 | `/voucher preview` | `provouchers.preview` | admin | Browse loaded vouchers in a GUI and give yourself a copy. |
 | `/voucher list` | `provouchers.list` | admin | List loaded vouchers and the code count. |
 | `/voucher reload [id]` | `provouchers.reload` | admin | Reload all voucher and code files, or just one by id, reporting per-file errors. |
 | `/voucher resetuses <id> [player]` | `provouchers.resetuses` | admin | Clear the recorded use counters for a voucher or code, for one player or everyone. |
+| `/voucher import crazyvouchers` | `provouchers.import` | admin | Import CrazyVouchers configs as ProVouchers voucher files. |
 | `/voucher fromhand <id>` | `provouchers.fromhand` | admin | Capture the held item as a new voucher file, behind a confirm GUI. |
 | `/voucher doctor` | `provouchers.doctor` | admin | Print a diagnostic health report (storage, integrations, content, locale). |
 
@@ -36,9 +37,11 @@ a voucher set to `stackable: false` is stamped per item and does not stack (see
 
 ```text
 /voucher giveall crate_key 1
+/voucher giveall crate_key 1 group.vip   # only players with this permission
 ```
 
-Gives the voucher to every player currently online. Players who are offline are not
+Gives the voucher to every player currently online, or only to those holding the
+optional permission node. Players who are offline are not
 included (an offline delivery queue is planned but not yet active).
 
 ### redeem
@@ -77,6 +80,21 @@ that name, leaving every other loaded entry in place. This is handy for quick ed
 on a busy server. The id tab-completes from the loaded vouchers. A file that now
 fails to parse keeps its previously loaded version, so a typo never drops a working
 voucher.
+
+### import
+
+```text
+/voucher import crazyvouchers
+```
+
+Reads the CrazyVouchers data folder next to ProVouchers, both the modern
+one-file-per-voucher layout and the legacy `vouchers.yml`, and writes each voucher
+as a ProVouchers file: legacy `&` color codes convert to MiniMessage, `{player}`
+and `{arg}` become `%player%` and `%arg%`, give-items become
+[defined items](/docs/vouchers#defined-items), and sounds, fireworks, heads, and
+permissions map to their equivalents. Existing ids are never overwritten, and
+anything without an equivalent is reported rather than silently dropped. Review
+the imported files, then adjust and `/voucher reload`.
 
 ### resetuses
 

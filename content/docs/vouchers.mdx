@@ -111,6 +111,23 @@ effects:
 to `1`). The firework never deals damage. Batch-open redemptions stay silent, so
 opening a whole stack does not spam the effects.
 
+## Soulbound
+
+Bind a voucher to its player so it cannot change hands:
+
+```yaml
+soulbound: true        # all restrictions on
+# or toggle each restriction:
+soulbound:
+  block-drop: true       # cannot be dropped
+  block-containers: true # cannot go into chests, hoppers, or item frames
+  bind-on-pickup: true   # an unowned copy binds to whoever picks it up
+```
+
+A soulbound voucher is stamped with its owner when given, like `owner-only`.
+Pair it with `owner-only: true` if the voucher should also refuse to *redeem*
+for anyone else. Blocked actions show a short action-bar notice.
+
 ## Use limits
 
 ```yaml
