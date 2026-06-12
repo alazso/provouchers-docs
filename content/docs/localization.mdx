@@ -10,8 +10,10 @@ are per-voucher and already yours to write (see [Text](/docs/text)).
 
 ## How it works
 
-ProVouchers ships English at `lang/en.yml`, written to `plugins/ProVouchers/lang/` on
-first start. Messages are MiniMessage with a `{prefix}` placeholder and message-specific
+ProVouchers ships seven languages, written to `plugins/ProVouchers/lang/` on first
+start: English (`en`), German (`de`), French (`fr`), Spanish (`es`), Polish (`pl`),
+Danish (`da`), and Dutch (`nl`). English is the ground truth and the fallback.
+Messages are MiniMessage with a `{prefix}` placeholder and message-specific
 placeholders:
 
 ```yaml title="lang/en.yml (excerpt)"
@@ -23,9 +25,11 @@ redeem:
 
 ## Translating
 
-Copy `lang/en.yml` to `lang/<code>.yml` (a Minecraft language code such as `de`, `fr`,
-or `es`), translate the values, and keep the keys and `{placeholders}` unchanged. Then
-either set the active language or rely on per-player detection:
+For a language that is not bundled, copy `lang/en.yml` to `lang/<code>.yml` (a
+Minecraft language code such as `it` or `pt`), translate the values, and keep the keys
+and `{placeholders}` unchanged. The bundled translations can be edited the same way;
+your edits are kept across updates. Then either set the active language or rely on
+per-player detection:
 
 ```yaml title="config.yml"
 locale:
