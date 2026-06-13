@@ -87,17 +87,20 @@ voucher.
 /voucher import crazyvouchers
 ```
 
-Reads the CrazyVouchers data folder next to ProVouchers, both the modern
-one-file-per-voucher layout and the legacy `vouchers.yml`, and writes each voucher
-as a ProVouchers file: legacy `&` color codes convert to MiniMessage, `{player}`
-and `{arg}` become `%player%` and `%arg%`, give-items become
-[defined items](/docs/vouchers#defined-items), and sounds, fireworks, heads,
-world whitelists, usage limiters, and permission whitelists map to their
-equivalents (conditions, `max-uses`, and so on). Existing ids are never
-overwritten. Preview-only visuals (display damage and trim) and CrazyVouchers
-internals are skipped silently; anything behavioural with no equivalent (such as
-a blacklist permission) is reported. Review the imported files, then adjust and
-`/voucher reload`.
+Reads the CrazyVouchers data folder next to ProVouchers, both **vouchers**
+(modern per-file and the legacy `vouchers.yml`) and **codes** (modern per-file
+and the legacy `codes.yml`), and writes each as a ProVouchers file: legacy `&`
+color codes convert to MiniMessage, `{player}` and `{arg}` become `%player%` and
+`%arg%`, give-items become [defined items](/docs/vouchers#defined-items), and
+commands, weighted random commands, sounds, fireworks, heads, world whitelists,
+usage limiters, and permission whitelists map to their equivalents (conditions,
+`max-uses`, `random-rewards`, and so on). Existing ids are never overwritten.
+
+Every key with no ProVouchers equivalent is **reported, never silently dropped**,
+so a migration can be audited completely: preview-only visuals (display damage and
+trim), tooltip/item-model components, blacklist permissions, item enchantments, and
+the like each produce a line in the result. The full report is printed without
+truncation. Review the imported files, then adjust and `/voucher reload`.
 
 ### resetuses
 
