@@ -84,17 +84,22 @@ voucher.
 ### import
 
 ```text
-/voucher import crazyvouchers
+/voucher import <source>     # e.g. /voucher import crazyvouchers
 ```
 
-Reads the CrazyVouchers data folder next to ProVouchers, both **vouchers**
-(modern per-file and the legacy `vouchers.yml`) and **codes** (modern per-file
-and the legacy `codes.yml`), and writes each as a ProVouchers file: legacy `&`
-color codes convert to MiniMessage, `{player}` and `{arg}` become `%player%` and
-`%arg%`, give-items become [defined items](/docs/vouchers#defined-items), and
-commands, weighted random commands, sounds, fireworks, heads, world whitelists,
-usage limiters, and permission whitelists map to their equivalents (conditions,
-`max-uses`, `random-rewards`, and so on). Existing ids are never overwritten.
+Imports another voucher plugin's configuration into ProVouchers files. The source
+is tab-completed from the plugins whose data is present. **CrazyVouchers** is built
+in; the importer is a [pluggable framework](https://github.com/alazso/provouchers)
+so more sources can be added.
+
+For CrazyVouchers it reads both **vouchers** (modern per-file and the legacy
+`vouchers.yml`) and **codes** (modern per-file and the legacy `codes.yml`), and
+writes each as a ProVouchers file: legacy `&` color codes convert to MiniMessage,
+`{player}` and `{arg}` become `%player%` and `%arg%`, give-items (including their
+enchantments, damage, and trim) become [defined items](/docs/vouchers#defined-items),
+and commands, random and chance commands, sounds, fireworks, heads, cooldowns,
+world whitelists, usage limiters, permission whitelists, required placeholders, and
+item models map to their ProVouchers equivalents. Existing ids are never overwritten.
 
 Every key with no ProVouchers equivalent is **reported, never silently dropped**,
 so a migration can be audited completely: preview-only visuals (display damage and

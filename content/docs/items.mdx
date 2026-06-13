@@ -33,6 +33,30 @@ item:
 `glow: true` adds the enchantment glint without showing any enchantment in the
 tooltip. It works with no resource pack.
 
+## Enchantments, durability, and trim
+
+Any item (a voucher's own icon or a [defined reward item](/docs/vouchers#defined-items))
+can carry extra appearance:
+
+```yaml
+item:
+  material: DIAMOND_CHESTPLATE
+  enchantments:          # key: level, validated at load
+    protection: 4
+    unbreaking: 3
+  damage: 50             # durability damage
+  unbreakable: true      # never loses durability
+  trim:                  # armor only
+    material: quartz
+    pattern: sentry
+  item-model: "minecraft:diamond_chestplate"   # modern model selector (1.21.4+)
+  hide-tooltip: false    # hide the item's entire tooltip
+```
+
+Real enchantments glint on their own, so `glow` is only needed on an item without
+them. `item-model` is the successor to custom model data; set whichever your
+resource pack uses.
+
 ## Custom model data
 
 ```yaml
