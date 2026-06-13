@@ -91,10 +91,13 @@ Reads the CrazyVouchers data folder next to ProVouchers, both the modern
 one-file-per-voucher layout and the legacy `vouchers.yml`, and writes each voucher
 as a ProVouchers file: legacy `&` color codes convert to MiniMessage, `{player}`
 and `{arg}` become `%player%` and `%arg%`, give-items become
-[defined items](/docs/vouchers#defined-items), and sounds, fireworks, heads, and
-permissions map to their equivalents. Existing ids are never overwritten, and
-anything without an equivalent is reported rather than silently dropped. Review
-the imported files, then adjust and `/voucher reload`.
+[defined items](/docs/vouchers#defined-items), and sounds, fireworks, heads,
+world whitelists, usage limiters, and permission whitelists map to their
+equivalents (conditions, `max-uses`, and so on). Existing ids are never
+overwritten. Preview-only visuals (display damage and trim) and CrazyVouchers
+internals are skipped silently; anything behavioural with no equivalent (such as
+a blacklist permission) is reported. Review the imported files, then adjust and
+`/voucher reload`.
 
 ### resetuses
 
