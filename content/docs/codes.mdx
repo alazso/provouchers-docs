@@ -13,6 +13,7 @@ are specific to codes.
 ```yaml title="codes/launch_gift.yml"
 code: LAUNCH2026
 case-sensitive: false
+enabled: true
 max-uses: 500
 uses-per-player: 1
 expiry: "2026-12-31T23:59:59Z"
@@ -23,6 +24,8 @@ rewards:
   - "currency: give 1000"
   - "item: itemsadder:ax_wings_pack:phoenix_wings 1"
   - "message: <gradient:#FFD700:#FF4500>Thanks for joining at launch!</gradient>"
+effects:
+  sound: "minecraft:entity.player.levelup 1 1"
 ```
 
 ## Fields
@@ -31,6 +34,7 @@ rewards:
 | --- | --- | --- | --- |
 | `code` | string | file name | The literal text players type. |
 | `case-sensitive` | boolean | `false` | When `false`, `LAUNCH2026` and `launch2026` both match. |
+| `enabled` | boolean | `true` | Set `false` to keep the code loaded but refuse every redeem with `code.disabled`. |
 | `max-uses` | integer | `-1` | Global redemption cap across all players. `-1` means unlimited. |
 | `uses-per-player` | integer | `1` | How many times a single player may redeem it. |
 | `expiry` | string | `""` | Use an absolute ISO-8601 instant (see the note below). |
@@ -38,6 +42,7 @@ rewards:
 | `rewards` | list | empty | See [Rewards](/docs/rewards). |
 | `random-rewards` | list | empty | Weighted "pick one" rewards. |
 | `has-argument` | boolean | `false` | Accept a trailing argument, exposed to rewards as `%arg%`. |
+| `effects` | map | empty | A sound and/or firework played to the redeemer on success. See [Redeem effects](#redeem-effects). |
 
 ## Use limits
 
@@ -70,6 +75,24 @@ rewards:
 
 The `%arg%` is substituted into rewards and messages before MiniMessage is
 rendered. See [Rewards](/docs/rewards#placeholders) for the full placeholder list.
+
+## Redeem effects
+
+Like vouchers, a code can play a sound and/or a firework to the player on a
+successful redeem:
+
+```yaml
+effects:
+  sound: "minecraft:entity.player.levelup 1 1"   # key [volume] [pitch]
+  firework:
+    colors: [ YELLOW, "#FF8A00" ]   # named colors or #RRGGBB hex
+    fade: [ RED ]                   # optional fade colors
+    type: BALL                      # BALL | BALL_LARGE | STAR | BURST | CREEPER
+    power: 0                        # 0 detonates at the player, up to 2 to fly
+```
+
+The block is identical to a voucher's; see [Redeem effects](/docs/vouchers#redeem-effects)
+for the field details. The firework never deals damage.
 
 ## Expiry
 

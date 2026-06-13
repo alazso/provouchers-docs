@@ -98,8 +98,11 @@ writes each as a ProVouchers file: legacy `&` color codes convert to MiniMessage
 `{player}` and `{arg}` become `%player%` and `%arg%`, give-items (including their
 enchantments, damage, and trim) become [defined items](/docs/vouchers#defined-items),
 and commands, random and chance commands, sounds, fireworks, heads, cooldowns,
-world whitelists, usage limiters, permission whitelists, required placeholders, and
-item models map to their ProVouchers equivalents. Existing ids are never overwritten.
+world whitelists, usage limiters, permission whitelists, required placeholders, dye
+colors, the enabled toggle, and item models map to their ProVouchers equivalents.
+A disabled CrazyVouchers code keeps its `enabled: false`, and a code's own sound and
+firework become its [redeem effects](/docs/codes#redeem-effects). Existing ids are
+never overwritten.
 
 Every key with no ProVouchers equivalent is **reported, never silently dropped**,
 so a migration can be audited completely: preview-only visuals (display damage and

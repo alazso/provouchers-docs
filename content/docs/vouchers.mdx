@@ -22,6 +22,7 @@ lore:
   - "<gray>Right-click to open a crate"
   - ""
   - "<dark_gray>Season 1"
+enabled: true
 unredeemable: false
 owner-only: false
 has-argument: false
@@ -60,12 +61,19 @@ put in `display-name` and `lore`.
 
 | Key | Type | Default | What it does |
 | --- | --- | --- | --- |
+| `enabled` | boolean | `true` | Set `false` to keep the voucher loaded but refuse every redeem with `redeem.disabled`. An admin on/off switch. |
 | `unredeemable` | boolean | `false` | A display-only item that cannot be redeemed (useful for showcases or collectibles). |
 | `owner-only` | boolean | `false` | Only the player it was given to may redeem it. The owner is stamped at give time. |
 | `has-argument` | boolean | `false` | Reserved for a future parametric form. Codes already accept an argument via `/voucher redeem <code> <arg>`. |
 | `stackable` | boolean | `true` | When `true`, items stack and are not dupe-tracked. Set `false` to stamp each item with a unique id for [anti-dupe](/docs/anti-dupe); those items will not stack. |
 | `batch-open` | boolean | `false` | Shift-right-click a stack to redeem every item at once. Requires a stackable voucher with no cooldown (a reload error is raised otherwise). |
 | `two-step-authentication` | boolean | `false` | Require a confirming second click before redeeming. See [Two-step confirmation](#two-step-confirmation). |
+
+**Enabled vs unredeemable.** `enabled: false` is a temporary admin switch: the
+voucher still loads and can be given, but redeeming it just shows the disabled
+message, so you can pause a promotion without deleting its file. `unredeemable` is
+a permanent property of a collectible or showcase item that was never meant to be
+redeemed at all.
 
 **Owner-only** stamps the recipient's UUID onto the item when it is given. A
 different player holding the same item is rejected. `provouchers.bypass.owner`

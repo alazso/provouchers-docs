@@ -51,11 +51,16 @@ item:
     pattern: sentry
   item-model: "minecraft:diamond_chestplate"   # modern model selector (1.21.4+)
   hide-tooltip: false    # hide the item's entire tooltip
+  color: "#FF5555"       # dye leather armor, potions, or maps
 ```
 
 Real enchantments glint on their own, so `glow` is only needed on an item without
 them. `item-model` is the successor to custom model data; set whichever your
 resource pack uses.
+
+`color` dyes leather armor, tints a potion, or colors a filled map; it is ignored
+on any other material. The value is a named color (`red`, `lime`, `light_blue`, ...),
+a `#RRGGBB` hex string, or an `r,g,b` triple (`255,85,85`).
 
 ## Custom model data
 
