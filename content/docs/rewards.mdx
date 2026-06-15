@@ -170,27 +170,38 @@ ranks, replacing fragile `command:` lines like `lp user %player% parent addtemp 
 
 ```yaml
 rewards:
-  - "discord: @announce <gold>%player%</gold> hit the rare reward!"
-  - "discord: https://discord.com/api/webhooks/123/abc %player% redeemed a voucher"
+  - "discord: @announce <gold>%player%</gold> hit the rare reward!"   # content
+  - "discord: @rare-drop"                                             # a payload template
+  - "discord: https://discord.com/api/webhooks/123/abc %player% redeemed"  # inline URL
 ```
 
-`discord` posts a message to a Discord webhook. The first token is the target: either an
-`@name` resolved from the `webhooks` map in `config.yml`, or an inline webhook URL. The
-rest is the message.
+`discord` posts to a Discord webhook. The first token is the target: an `@name` from the
+`discord-webhooks` map in `config.yml`, or an inline webhook URL. Webhooks are defined as
+either a plain URL (the reward supplies the message, posted as the content) or a
+`{ url, payload }` block whose payload template is rendered and posted as-is:
 
 ```yaml title="config.yml"
-webhooks:
-  announce: "https://discord.com/api/webhooks/..."
-  staff: ""
+discord-webhooks:
+  announce: "https://discord.com/api/webhooks/..."   # content-only
+  rare-drop:                                          # full payload template
+    url: "https://discord.com/api/webhooks/..."
+    payload:
+      username: "Crate Bot"
+      embeds:
+        - title: "Rare drop!"
+          description: "%player% hit the jackpot, rolling %random:1-1000:roll%."
+          color: 16766720
 ```
 
-The `@name` form is recommended so the secret URL lives in one place instead of every
-voucher file. Placeholders (`%player%`, `%arg%`, `%random%`, PlaceholderAPI) are
-resolved, then the message is flattened to plain text since Discord does not render
-MiniMessage. The POST is asynchronous and a failure is logged, never aborting the other
-rewards. Put a `discord` reward in a [`random-rewards`](/docs/vouchers) set to announce
-only the rare hits; during a batch open it is skipped, like other notifications, so a
-stack does not spam the webhook.
+A reward using a payload-template webhook needs no message (`discord: @rare-drop`); the
+template is the message. Placeholders (`%player%`, `%arg%`, `%random%`, PlaceholderAPI)
+are resolved in every string of the template (numbers like `color` pass through), then it
+is serialized to JSON, so a resolved value containing quotes is escaped rather than able
+to corrupt the payload. The `@name` form is recommended so the secret URL lives in one
+place. The POST is asynchronous and a failure is logged, never aborting the other rewards.
+Put a `discord` reward in a [`random-rewards`](/docs/vouchers) set to announce only the
+rare hits; during a batch open it is skipped, like other notifications, so a stack does
+not spam the webhook.
 
 ## Placeholders
 
