@@ -35,6 +35,7 @@ Two keys hold rewards:
 | `currency` (`economy`, `money`, `eco`) | `[give\|take] <amount>` | Gives or takes currency |
 | `group` (`rank`) | `<add\|remove> <group> [duration]` | Adds or removes a permission group |
 | `permission` (`perm`) | `<add\|deny\|remove\|set> <node> [value]` | Sets or clears a permission node |
+| `discord` | `<@name\|url> <message>` | Posts a message to a Discord webhook |
 
 ### command and player-command
 
@@ -164,6 +165,32 @@ the data store). Pair them with a `message:` reward if you want to tell the play
 what they received. Granting a temporary group is the clean way to sell timed
 ranks, replacing fragile `command:` lines like `lp user %player% parent addtemp ...`.
 </Callout>
+
+### discord
+
+```yaml
+rewards:
+  - "discord: @announce <gold>%player%</gold> hit the rare reward!"
+  - "discord: https://discord.com/api/webhooks/123/abc %player% redeemed a voucher"
+```
+
+`discord` posts a message to a Discord webhook. The first token is the target: either an
+`@name` resolved from the `webhooks` map in `config.yml`, or an inline webhook URL. The
+rest is the message.
+
+```yaml title="config.yml"
+webhooks:
+  announce: "https://discord.com/api/webhooks/..."
+  staff: ""
+```
+
+The `@name` form is recommended so the secret URL lives in one place instead of every
+voucher file. Placeholders (`%player%`, `%arg%`, `%random%`, PlaceholderAPI) are
+resolved, then the message is flattened to plain text since Discord does not render
+MiniMessage. The POST is asynchronous and a failure is logged, never aborting the other
+rewards. Put a `discord` reward in a [`random-rewards`](/docs/vouchers) set to announce
+only the rare hits; during a batch open it is skipped, like other notifications, so a
+stack does not spam the webhook.
 
 ## Placeholders
 
