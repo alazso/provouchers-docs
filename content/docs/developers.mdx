@@ -71,6 +71,7 @@ if (vouchers != null) {
 | `getCode(input)` | `Optional<VoucherCode>` |
 | `voucherCount()` / `codeCount()` | `int` |
 | `give(player, voucherId, amount)` | `boolean` (false if the id is unknown) |
+| `stash(playerUuid, voucherId, amount)` | `boolean` (queue a virtual voucher in the player's [Stash](/docs/stash); works offline) |
 
 `Voucher` and `VoucherCode` are read-only views (id, display name, lore, flags,
 cooldown, expiry, use limits). They are implemented by ProVouchers and must not be

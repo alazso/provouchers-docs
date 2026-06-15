@@ -11,6 +11,8 @@ All commands live under `/voucher`, with the aliases `/pv` and `/vouchers`.
 | --- | --- | --- | --- |
 | `/voucher give <id> [amount] [player]` | `provouchers.give` | admin | Give a voucher to yourself or another player. |
 | `/voucher giveall <id> [amount] [permission]` | `provouchers.giveall` | admin | Give a voucher to every online player. |
+| `/voucher stashgive <player> <id> [amount] [argument]` | `provouchers.stashgive` | admin | Queue a voucher in a player's [Stash](/docs/stash), online or offline. |
+| `/stash` | `provouchers.stash` | player | Open your [Stash](/docs/stash) of claimable virtual vouchers. |
 | `/voucher redeem <code> [arg]` | `provouchers.redeem` | player | Redeem a typeable code. |
 | `/voucher preview` | `provouchers.preview` | admin | Browse loaded vouchers in a GUI and give yourself a copy. |
 | `/voucher list` | `provouchers.list` | admin | List loaded vouchers and the code count. |
@@ -41,8 +43,18 @@ a voucher set to `stackable: false` is stamped per item and does not stack (see
 ```
 
 Gives the voucher to every player currently online, or only to those holding the
-optional permission node. Players who are offline are not
-included (an offline delivery queue is planned but not yet active).
+optional permission node. To reach an offline player, use `stashgive`.
+
+### stashgive
+
+```text
+/voucher stashgive Steve crate_key
+/voucher stashgive Steve crate_key 3 vip   # 3 copies, with %arg% = vip
+```
+
+Queues a voucher in a player's [Stash](/docs/stash) instead of handing over an item.
+The target may be online or any player who has joined the server before, so this is how
+you deliver a reward to someone who is offline. They claim it with `/stash`.
 
 ### redeem
 

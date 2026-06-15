@@ -16,6 +16,7 @@
     "text",
     "---Server Administration---",
     "commands",
+    "stash",
     "storage",
     "anti-dupe",
     "config",

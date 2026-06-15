@@ -1,0 +1,80 @@
+---
+title: The Stash
+description: Virtual, itemless vouchers that players claim from a menu, so a reward is never lost.
+---
+
+The Stash is a per-player menu of **virtual vouchers**: vouchers that wait as data
+instead of as a held item, claimed with `/stash`. Claiming runs the voucher through
+the normal redeem pipeline, so it grants exactly what that voucher would. Vouchers are
+meant to be used soon, so the Stash is a waiting room, not long-term storage.
+
+## For players
+
+Open `/stash` (or a configured alias) to browse every reward waiting for you. Each card
+is the voucher's own icon; click it to claim. A **Claim all** button takes everything at
+once, and a join notification reports when rewards are waiting.
+
+## Putting vouchers in a Stash
+
+### `/voucher stashgive`
+
+```text
+/voucher stashgive <player> <id> [amount] [argument]
+```
+
+Queues a voucher for a player, **online or offline** (anyone who has joined the server
+before). Behind `provouchers.stashgive`.
+
+### Overflow
+
+When a give does not fit a player's inventory it drops at their feet by default. Set
+`stash.overflow: stash` and the remainder is queued in their Stash instead, so a full
+inventory never costs a reward.
+
+### The API
+
+```java
+vouchers.stash(playerUuid, "crate_key", 1);   // works for offline players
+```
+
+See [Developers](/docs/developers) for obtaining the `VoucherService`.
+
+## Claim rules
+
+A claim runs the voucher's [conditions](/docs/conditions) and fires the redeem events,
+then grants its rewards and [effects](/docs/vouchers#redeem-effects). It applies **no
+cooldown, use limit, or game-mode check**: the Stash entry is itself the one-time token,
+removed atomically before the grant so a reward is claimed at most once. A voucher that
+is `unredeemable` or `enabled: false` cannot be claimed.
+
+<Callout>
+Claiming is intentionally lighter than redeeming a held voucher. The decision to grant
+the reward was already made when it was stashed, so the per-item controls (cooldown,
+`max-uses`, two-step) do not re-apply on claim. The voucher's `conditions` still do.
+</Callout>
+
+## Expiry
+
+By default Stash entries never lapse. Set `stash.expire-after` (for example `30d`) to
+make new entries expire, nudging players to claim soon. Each card shows its countdown,
+and lapsed entries are swept automatically.
+
+## Configuration
+
+```yaml title="config.yml"
+stash:
+  enabled: true
+  command-aliases: [ rewards ]
+  title: "<gradient:#FFD700:#FF8A00>Your Stash"
+  rows: 6                    # menu height, 3 to 6
+  notify-on-join: true       # greet a joining player when rewards are waiting
+  expire-after: ""           # entries lapse after this (e.g. 30d); blank = never
+  overflow: drop             # when a give does not fit: drop the items, or stash them
+```
+
+Changing these needs a restart.
+
+| Permission | Default | Grants |
+| --- | --- | --- |
+| `provouchers.stash` | everyone | Open `/stash` |
+| `provouchers.stashgive` | op | Queue a voucher for any player |

@@ -49,6 +49,15 @@ redeem:
   # How many seconds a two-step-authentication confirmation stays valid.
   confirm-window-seconds: 5
 
+stash:
+  # Virtual vouchers players claim from a menu with /stash.
+  enabled: true
+  command-aliases: [ rewards ]
+  rows: 6
+  notify-on-join: true
+  expire-after: ""    # e.g. 30d; blank = never
+  overflow: drop      # drop | stash
+
 metrics:
   # Submit anonymous usage statistics (bStats and FastStats).
   # Set to false to opt out entirely.
@@ -127,6 +136,21 @@ cooldown:
 A player holding several tiers gets the lowest multiplier. Read once at startup;
 changing tiers needs a restart. `provouchers.bypass.cooldown` still skips
 cooldowns entirely.
+
+## stash
+
+The [Stash](/docs/stash) of virtual vouchers players claim with `/stash`. Read at
+startup; changing these needs a restart.
+
+| Key | Default | Notes |
+| --- | --- | --- |
+| `stash.enabled` | `true` | Register `/stash` and the join notification. |
+| `stash.command-aliases` | `[ rewards ]` | Extra names for `/stash`. |
+| `stash.title` | gradient | The menu title (MiniMessage). |
+| `stash.rows` | `6` | Menu height, `3` to `6`. |
+| `stash.notify-on-join` | `true` | Greet a joining player when rewards are waiting. |
+| `stash.expire-after` | `""` | New entries lapse after this (e.g. `30d`); blank never expires. |
+| `stash.overflow` | `drop` | When a give does not fit a player's inventory: `drop` the items, or `stash` them. |
 
 ## metrics
 
