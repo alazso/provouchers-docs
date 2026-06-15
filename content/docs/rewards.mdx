@@ -176,11 +176,12 @@ rewards:
 ```
 
 `discord` posts to a Discord webhook. The first token is the target: an `@name` from the
-`discord-webhooks` map in `config.yml`, or an inline webhook URL. Webhooks are defined as
-either a plain URL (the reward supplies the message, posted as the content) or a
-`{ url, payload }` block whose payload template is rendered and posted as-is:
+voucher (or code) file's own `discord-webhooks:` map, or an inline webhook URL. Webhooks
+are defined per file, alongside the [`items:` map](/docs/vouchers#defined-items), as either
+a plain URL (the reward supplies the message, posted as the content) or a `{ url, payload }`
+block whose payload template is rendered and posted as-is:
 
-```yaml title="config.yml"
+```yaml title="vouchers/mystery-crate.yml"
 discord-webhooks:
   announce: "https://discord.com/api/webhooks/..."   # content-only
   rare-drop:                                          # full payload template
@@ -191,6 +192,13 @@ discord-webhooks:
         - title: "Rare drop!"
           description: "%player% hit the jackpot, rolling %random:1-1000:roll%."
           color: 16766720
+
+rewards:
+  - "discord: @announce %player% opened a crate!"
+random-rewards:
+  - weight: 1
+    rewards:
+      - "discord: @rare-drop"
 ```
 
 A reward using a payload-template webhook needs no message (`discord: @rare-drop`); the
