@@ -167,6 +167,23 @@ rewards:
 A reference to an undefined name fails at `/voucher reload`, not at redeem time.
 Codes support the same `items:` map.
 
+## Discord webhooks
+
+Name Discord webhooks per file and post to them from a `discord: @<name>` reward,
+the same way `items:` names reusable items:
+
+```yaml
+discord-webhooks:
+  announce: "https://discord.com/api/webhooks/..."   # content-only
+rewards:
+  - "discord: @announce <gold>%player%</gold> redeemed it!"
+```
+
+A named webhook can instead carry a full `{ url, payload }` template. A reference
+to an undefined name fails at `/voucher reload`. See
+[Rewards](/docs/rewards#discord) for payload templates and placeholder handling.
+Codes support the same `discord-webhooks:` map.
+
 ## Cooldown
 
 ```yaml
