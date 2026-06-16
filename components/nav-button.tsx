@@ -29,10 +29,10 @@ export function NavButton({
     (href === '/docs' ? pathname === href : pathname.startsWith(href));
 
   const variant = brand
-    ? 'bg-[#5865F2] text-white shadow-sm hover:bg-[#4752c4]'
+    ? 'border border-transparent bg-[#5865F2] text-white shadow-sm hover:bg-[#4752c4]'
     : active
-      ? 'bg-fd-primary/15 text-fd-primary'
-      : 'bg-fd-secondary text-fd-secondary-foreground hover:bg-fd-accent hover:text-fd-accent-foreground';
+      ? 'border border-fd-primary/40 bg-fd-primary/15 text-fd-primary'
+      : 'border border-fd-border bg-fd-secondary text-fd-secondary-foreground hover:border-fd-accent hover:bg-fd-accent hover:text-fd-accent-foreground';
 
   const externalProps = external
     ? { target: '_blank', rel: 'noreferrer noopener' }
