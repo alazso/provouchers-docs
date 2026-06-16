@@ -28,6 +28,15 @@ Yes. ProVouchers is Folia-safe throughout: redemption checks run on the player's
 region thread, database work runs asynchronously, and rewards are scheduled back on
 the player.
 
+### I see a `sun.misc.Unsafe` warning at startup. Is something wrong?
+
+No, and it is not from ProVouchers. A line like `WARNING: sun.misc.Unsafe::objectFieldOffset
+has been called by org.joml.MemUtil` comes from JOML, a math library the server itself
+ships in its own `libraries/` folder, not from any plugin. It is a harmless one-time JDK
+deprecation notice on Java 24+, and the server runs normally; it goes away once your
+server software bundles an updated JOML. To silence it, add
+`--sun-misc-unsafe-memory-access=allow` to your JVM arguments, before `-jar`.
+
 ## Configuration
 
 ### Where do I configure a voucher?
@@ -189,8 +198,11 @@ player and the voucher.
 
 ### Can I give a voucher to an offline player?
 
-Not yet. `give` and `giveall` reach online players only; an offline-give queue is
-planned. Give the voucher when the player is online.
+Yes, as a virtual voucher in their [Stash](/docs/stash). `/voucher give` and
+`giveall` hand over a physical item, so they reach online players only, but
+`/voucher stashgive <player> <id> [amount] [argument]` queues the voucher for any
+player who has joined the server before, online or not. They claim it from `/stash`
+next time they play. The API equivalent is `VoucherService.stash(uuid, id, amount)`.
 
 ### `/voucher give` from the console did nothing.
 
