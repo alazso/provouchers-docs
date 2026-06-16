@@ -5,7 +5,7 @@ import { usePathname } from 'next/navigation';
 import type { ReactNode } from 'react';
 
 const base =
-  'inline-flex items-center gap-1.5 rounded-full px-4 py-1.5 text-sm font-medium transition-colors';
+  'inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-sm font-medium transition-colors';
 
 /**
  * A rounded pill nav link. Internal links highlight when active; `brand` renders the
@@ -31,8 +31,8 @@ export function NavButton({
   const variant = brand
     ? 'bg-[#5865F2] text-white shadow-sm hover:bg-[#4752c4]'
     : active
-      ? 'bg-fd-primary/10 text-fd-primary'
-      : 'text-fd-muted-foreground hover:bg-fd-accent hover:text-fd-accent-foreground';
+      ? 'bg-fd-primary/15 text-fd-primary'
+      : 'bg-fd-secondary text-fd-secondary-foreground hover:bg-fd-accent hover:text-fd-accent-foreground';
 
   const externalProps = external
     ? { target: '_blank', rel: 'noreferrer noopener' }
