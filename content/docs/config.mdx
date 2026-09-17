@@ -10,6 +10,9 @@ and [Code Reference](/docs/codes)).
 ## The full file
 
 ```yaml title="config.yml"
+# Extra names for /voucher. Remove any that clash with another plugin; [] registers none.
+command-aliases: [ pv, vouchers ]
+
 locale:
   # Language for plugin messages. ProVouchers ships English (lang/en.yml); copy it to
   # lang/<code>.yml (e.g. lang/de.yml) to translate. Missing keys fall back to English.
@@ -64,6 +67,17 @@ metrics:
   # Set to false to opt out entirely.
   enabled: true
 ```
+
+## command-aliases
+
+| Key | Default | Notes |
+| --- | --- | --- |
+| `command-aliases` | `[ pv, vouchers ]` | Extra names for `/voucher`. `[]` registers none. |
+
+Remove an alias that another plugin also uses: PlayerVaults, for example, uses
+`/pv`, so `command-aliases: [ vouchers ]` hands `/pv` back to it. `/voucher` itself
+always works. Aliases are trimmed and lower-cased, and blank entries are ignored.
+Read at startup, so a change needs a restart.
 
 ## locale
 
@@ -166,6 +180,6 @@ is in use and how many vouchers are loaded). They never include player data. See
 
 ## Applying changes
 
-`config.yml` is read on startup. After editing it, restart the server for storage,
-locale, and redeem settings to take effect. Voucher and code files, and the language
+`config.yml` is read on startup. After editing it, restart the server for command
+aliases, storage, locale, and redeem settings to take effect. Voucher and code files, and the language
 files in `lang/`, are reloaded live with `/voucher reload`.
