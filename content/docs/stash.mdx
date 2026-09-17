@@ -11,8 +11,10 @@ meant to be used soon, so the Stash is a waiting room, not long-term storage.
 ## For players
 
 Open `/stash` (or a configured alias) to browse every reward waiting for you. Each card
-is the voucher's own icon; click it to claim. A **Claim all** button takes everything at
-once, and a join notification reports when rewards are waiting.
+is the voucher's own icon; click it to claim. Deliveries of the same voucher share one
+card showing their total, except deliveries that expire, which get a card each. A
+**Claim all** button takes everything at once, and a join notification reports when
+rewards are waiting.
 
 ## Putting vouchers in a Stash
 
@@ -45,8 +47,11 @@ See [Developers](/docs/developers) for obtaining the `VoucherService`.
 A claim runs the voucher's [conditions](/docs/conditions) and fires the redeem events,
 then grants its rewards and [effects](/docs/vouchers#redeem-effects). It applies **no
 cooldown, use limit, or game-mode check**: the Stash entry is itself the one-time token,
-removed atomically before the grant so a reward is claimed at most once. A voucher that
-is `unredeemable` or `enabled: false` cannot be claimed.
+removed atomically before the grant so a reward is claimed at most once. A card claims
+exactly the deliveries it showed, so a delivery that arrives while the menu is open
+stays queued. If a claim is refused or the player logs out before the grant, the
+entries go back into the Stash unchanged. A voucher that is `unredeemable` or
+`enabled: false` cannot be claimed.
 
 <Callout>
 Claiming is intentionally lighter than redeeming a held voucher. The decision to grant

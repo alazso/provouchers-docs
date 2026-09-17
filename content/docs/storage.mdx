@@ -63,6 +63,13 @@ share anti-dupe and code-use data, so a voucher item or a one-time code cannot b
 redeemed again on a different server in the network.
 </Callout>
 
+<Callout type="warn">
+Run the same ProVouchers version on every server that shares a database, and update
+them together. An older version running alongside a newer one keeps use limits and
+Stash entries in an older format, so limits can be exceeded and Stash deliveries
+can be miscounted.
+</Callout>
+
 ## What is stored
 
 ProVouchers keeps a small, indexed schema (tables are prefixed `provouchers_`):
@@ -70,9 +77,10 @@ ProVouchers keeps a small, indexed schema (tables are prefixed `provouchers_`):
 | Table | Holds |
 | --- | --- |
 | `provouchers_used_vouchers` | One row per redeemed anti-dupe voucher item, keyed by its unique id. Powers anti-dupe. |
-| `provouchers_code_uses` | Per-player redemption counts for codes. Powers `uses-per-player` and `max-uses`. |
+| `provouchers_code_uses` | Per-player redemption counts for codes and use-limited vouchers. Powers `uses-per-player`. |
+| `provouchers_use_totals` | The total redemption count of each code and use-limited voucher, kept in step with the per-player counts. Powers `max-uses`. |
 | `provouchers_cooldowns` | Per-player, per-voucher cooldown expiry. Survives restarts; loaded on join. |
-| `provouchers_stash` | One row per queued virtual voucher (a [Stash](/docs/stash) entry): player, voucher id, amount, and optional expiry. Powers `/stash` and `stashgive`. |
+| `provouchers_stash` | One row per [Stash](/docs/stash) delivery: player, voucher id, amount, and optional expiry. Powers `/stash` and `stashgive`. |
 
 Lookups are by primary key and writes happen off the main thread, so storage never
 blocks gameplay. The schema is created and migrated automatically on first start.

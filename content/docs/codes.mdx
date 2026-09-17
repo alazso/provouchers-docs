@@ -54,7 +54,10 @@ restarts:
 - **`max-uses`** caps the total redemptions across everyone. Set it to limit a
   giveaway to the first N claims; leave it at `-1` for no global cap.
 
-Both are checked together, off the main thread, before any reward runs.
+Both are reserved together in the database, off the main thread, before any reward
+runs, so players redeeming at the same moment (even on different servers sharing a
+database) cannot exceed either limit. If the player logs out before the reward is
+granted, the use is given back.
 
 ## Arguments
 

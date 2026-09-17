@@ -68,16 +68,21 @@ these steps in order and stops at the first failure:
 3. **Owner check** (vouchers only): `owner-only` vouchers reject other players.
 4. **Expiry check**: expired vouchers and codes are rejected.
 5. **Game mode gate**: creative and spectator are blocked by default.
-6. **Cooldown check**: per-player, per-voucher.
+6. **Cooldown check**: per-player, per-voucher. Right after a player joins, a
+   voucher with a cooldown waits until their stored cooldowns have loaded.
 7. **Conditions**: every condition must pass; the first failure shows its message.
 8. **Anti-dupe / use limits** (checked off the main thread): a duplicate voucher
-   item or an exhausted code is rejected.
-9. **Rewards run**: always-run rewards plus one weighted random set, each reward
-   executed independently.
+   item or an exhausted limit is rejected. A use is reserved in the database here,
+   so players redeeming at the same moment cannot exceed a limit.
+9. **Rewards run**: the voucher item is taken from the inventory, then always-run
+   rewards plus one weighted random set run, each reward executed independently.
 
 Steps 1 to 7 are instant and on the player's thread. Step 8 touches the database,
 so it runs asynchronously, then control returns to the player to grant rewards.
-This keeps the server (and Folia regions) responsive.
+This keeps the server (and Folia regions) responsive. If the player logs out, or
+moves the voucher out of their inventory, before the rewards run, nothing is used
+up: the reserved use is given back and the voucher still works. While a redeem is
+in progress, further clicks on the same voucher are ignored.
 
 ## One self-contained plugin
 

@@ -157,8 +157,16 @@ the give time. See [Voucher expiry](/docs/vouchers#expiry).
 ### Do cooldowns survive a restart?
 
 Yes. Cooldowns are persisted to the database and reloaded when a player joins. On a
-network sharing one database, a voucher's cooldown applies across all servers. See
-the [Voucher Reference](/docs/vouchers#cooldown).
+network sharing one database, a voucher's cooldown applies across all servers, and
+a voucher with a cooldown waits until the player's stored cooldowns have loaded, so
+switching servers cannot skip one. See the
+[Voucher Reference](/docs/vouchers#cooldown).
+
+### A voucher says it could not be verified.
+
+The database could not be reached, or, right after the player joined, their stored
+cooldowns were still loading. Nothing is used up; try again in a moment. If it keeps
+happening, check the console for storage errors (see [Storage](/docs/storage)).
 
 ### How do I limit a code to the first N players?
 
