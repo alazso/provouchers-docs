@@ -2,12 +2,11 @@ import { defineConfig, defineDocs } from 'fumadocs-mdx/config';
 import { metaSchema, pageSchema } from 'fumadocs-core/source/schema';
 import type { Node, Parent, Literal } from 'unist';
 
-// Version strings injected into code snippets at build time.
-// CI stamps these from gradle.properties (see release.yml).
+// Plugin version injected into code snippets at build time. The deploy workflow sets
+// PLUGIN_VERSION from the latest plugin release, or from gradle.properties on main.
 const PLUGIN_VERSION = process.env.PLUGIN_VERSION || '0.1.0';
 
-// Replaces PLUGIN_VERSION tokens in all text/code nodes before syntax
-// highlighting, so snippets stay copy-pasteable with the real version.
+// Replaces PLUGIN_VERSION tokens in text and code nodes before syntax highlighting.
 function remarkPluginVersion() {
   return (tree: Node) => {
     const walk = (node: Node) => {

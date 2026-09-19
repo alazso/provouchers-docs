@@ -35,7 +35,7 @@ export default async function Page(props: PageProps<'/docs/[[...slug]]'>) {
       <DocsBody>
         <MDX
           components={getMDXComponents({
-            // this allows you to link to other pages with relative file paths
+            // Resolves relative file links between docs pages.
             a: createRelativeLink(source, page),
           })}
         />

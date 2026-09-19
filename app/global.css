@@ -4,8 +4,7 @@
 
 /* ---- ProVouchers brand palette (Autumn Gold) ---- */
 /* Gold #FFD700, Tomato #FF6347, Coral #FF7F50, OrangeRed #FF4500, Dark Red #8B0000 */
-/* Light: warm parchment. Kept a few points off white to avoid glare, with darker
-   text, a visibly darker code surface, and borders that actually show. */
+/* Light theme: warm parchment background with darker text, code surface, and borders. */
 @theme {
   --color-fd-primary: hsl(18 95% 38%);
   --color-fd-primary-foreground: hsl(0 0% 100%);
@@ -79,9 +78,8 @@ body::before {
   pointer-events: none;
 }
 
-/* Code blocks in light mode: the shiki light theme background is near-white, which
-   disappears against the parchment page. Use a warm, clearly darker surface instead.
-   Dark mode keeps the theme's own background. */
+/* Light mode code blocks use a darker surface than shiki's near-white default, which
+   matches the page background. Dark mode keeps the theme's background. */
 :root:not(.dark) figure.shiki {
   background-color: hsl(42 30% 90%);
 }
@@ -96,8 +94,8 @@ body {
   background-repeat: no-repeat;
 }
 
-/* Reusable gradient text (amber to orangered), used by the nav wordmark and hero.
-   The light variant uses darker stops; bright gold is unreadable on a light background. */
+/* Gradient text (amber to orangered) for the nav wordmark and hero. Light mode uses
+   darker stops for contrast. */
 .text-gradient {
   background-image: linear-gradient(135deg, hsl(38 95% 38%), hsl(18 100% 42%), hsl(8 90% 40%));
   -webkit-background-clip: text;
@@ -109,10 +107,9 @@ body {
   background-image: linear-gradient(135deg, hsl(51 100% 52%), hsl(16 100% 62%), hsl(16 100% 50%));
 }
 
-/* Slightly taller home navbar to give the wordmark and pill nav buttons more
-   room. Fumadocs hardcodes h-14 (3.5rem) on the #nd-nav header and its inner
-   flex row; override exactly those (via the h-14 class) and keep the sticky
-   content offset in sync, without touching the dropdown viewport. */
+/* 4rem navbar. Fumadocs hardcodes h-14 on the #nd-nav header and its inner row, so
+   both are overridden through the h-14 class, and --fd-nav-height keeps the sticky
+   content offset in sync. The dropdown viewport keeps its own height. */
 :root {
   --fd-nav-height: 4rem;
 }
