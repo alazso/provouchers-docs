@@ -63,7 +63,7 @@ stash:
   overflow: drop      # drop | stash
 
 metrics:
-  # Submit anonymous usage statistics (bStats and FastStats).
+  # Submit pseudonymous usage statistics (bStats and FastStats).
   # Set to false to opt out entirely.
   enabled: true
 ```
@@ -173,7 +173,7 @@ startup; changing these needs a restart, except `stash.overflow`, which
 
 | Key | Default | Notes |
 | --- | --- | --- |
-| `metrics.enabled` | `true` | Submit anonymous usage stats (bStats and FastStats). Set to `false` to opt out. |
+| `metrics.enabled` | `true` | Submit pseudonymous usage stats (bStats and FastStats). Set to `false` to opt out. |
 
 Metrics report only aggregate, non-identifying data (such as which storage backend
 is in use and how many vouchers are loaded). They never include player data. See
