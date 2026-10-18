@@ -52,8 +52,9 @@ Read from the loaded configuration on each submission.
 
 ### Activity
 
-Counts accumulated since the server started. They reset to zero on restart and
-never contain anything about *who* redeemed *what*.
+Each report carries the increase since the previous report, so the charts read as
+activity per interval rather than a line that climbs with uptime. They never contain
+anything about *who* redeemed *what*.
 
 | Chart | Meaning |
 | --- | --- |
@@ -71,3 +72,31 @@ never contain anything about *who* redeemed *what*.
 
 Each chart is defined once and reported to both backends, and the single
 `metrics.enabled` switch governs both.
+
+## Checking it works
+
+Run `/voucher doctor`. Its `Metrics` line reports what each backend is doing:
+
+```text
+Metrics: bStats on, FastStats bukkit 0.30.2 on (errors on)
+```
+
+| Reads | Meaning |
+| --- | --- |
+| `off (metrics.enabled: false)` | Turned off in `config.yml`. Nothing is collected. |
+| `not started` | Metrics are on, but no backend started. The console logs why at startup. |
+| `bStats not started` | bStats failed to start, usually no network at startup. |
+| `FastStats opted out on this server` | Opted out in `config/faststats/config.properties`, or started with `-Dfaststats.enabled=false`. |
+| `FastStats not submitting metrics` | FastStats runs but its metrics submission is off in that file. |
+| `(errors off)` | Error reports are not sent, either by that file or because the service did not start. |
+
+<Callout>
+FastStats submits nothing on a brand new server: the first start writes
+`config/faststats/config.properties`, and submission begins on the next start. A
+first run showing `on` is normal and correct.
+</Callout>
+
+To watch it submit, start the server with `-Dfaststats.debug=true`. The console then
+logs the FastStats context on startup and each submission as it is sent. On a test or
+development server, start with `-Dfaststats.enabled=false` instead, so its data stays
+out of the live project.
