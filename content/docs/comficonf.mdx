@@ -1,0 +1,81 @@
+---
+title: Web Config Editor
+description: Edit config.yml in the browser with ComfiConf, without touching the file.
+---
+
+ProVouchers can expose the settings of `config.yml` to
+[ComfiConf](https://docs.comficonf.com), a web editor for Minecraft plugin
+settings. Server owners edit the settings in a browser, each change is written
+back to `config.yml` on the server, and most of them take effect at once.
+
+This is entirely optional. ComfiConf is a separate plugin, ProVouchers never
+bundles it, and nothing about ProVouchers changes when it is not installed.
+
+## Setting it up
+
+1. Install the ComfiConf bridge plugin on the server:
+   [Install the bridge](https://docs.comficonf.com/getting-started/install-the-bridge).
+   ProVouchers needs bridge version 0.1.0 or newer.
+2. Pair the server with your ComfiConf account:
+   [Pair your server](https://docs.comficonf.com/getting-started/pair-your-server).
+3. Restart the server. ProVouchers registers itself with the bridge while it
+   enables, under the resource id `provouchers:config`.
+4. Open [app.comficonf.com](https://app.comficonf.com) and pick ProVouchers.
+
+`/voucher doctor` reports the state of the hook:
+
+| Line | Meaning |
+| --- | --- |
+| `ComfiConf: provouchers:config (registered)` | The settings are available in the editor. |
+| `ComfiConf: installed, not registered` | The bridge is present but registration failed. The console says why. |
+| `ComfiConf: not installed` | No bridge on the server. Nothing is exposed. |
+
+## What is exposed
+
+Every setting of `config.yml`, with its own description, type and allowed values.
+The database settings appear only when `storage.backend` is not `sqlite`, and
+`storage.password` is write-only: a new password can be set, but the stored one is
+never sent to the editor or shown anywhere.
+
+Voucher and code files are not exposed. Edit those on the server and run
+`/voucher reload`.
+
+## Which changes apply at once
+
+These take effect the moment they are saved, with no restart:
+
+- `anti-dupe.remove-on-discovery`, `anti-dupe.warning.enabled`,
+  `anti-dupe.warning.text`, `anti-dupe.notify.enabled`
+- `redeem.left-click-preview`, `redeem.batch-open-quiet`,
+  `redeem.confirm-window-seconds`, `redeem.confirm-style`
+- `stash.title`, `stash.rows`, `stash.overflow`
+
+Everything else decides what is built while the server starts: the command
+aliases, the language settings, the storage backend and its connection, whether
+`/stash` exists, and the metrics opt-out. The editor marks those **Restart
+required**, and saving one tells you the value is stored but not yet in use.
+
+## What happens to your file
+
+Each save rewrites `config.yml` in place and keeps everything that is not a
+setting: all comments, the order of the keys, the line endings the file already
+used, and any key ProVouchers does not know about. The previous version of the
+file is copied to `plugins/ProVouchers/backups/` first.
+
+<Callout>
+If `config.yml` changed on disk after the editor loaded it, by hand or by another
+tool, the save is refused as a conflict and nothing is written. Reload the editor
+to see the current file, then make the change again.
+</Callout>
+
+A value that YAML cannot store unchanged is rejected before anything is written,
+and the editor says which setting is at fault. Nothing is ever half-applied: the
+file is written only after the new values read back exactly as proposed.
+
+## Editing the file directly still works
+
+Nothing about editing `config.yml` by hand changes. `/voucher reload` applies the
+settings listed above, and ProVouchers tells the editor to refresh so that it
+never shows a stale copy of the file.
+
+See the [config.yml Reference](/docs/config) for what every setting does.

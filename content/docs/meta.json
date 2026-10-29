@@ -20,6 +20,7 @@
     "storage",
     "anti-dupe",
     "config",
+    "comficonf",
     "localization",
     "metrics",
     "---Developers---",

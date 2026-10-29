@@ -52,11 +52,14 @@ redeem:
   batch-open-quiet: true
   # How many seconds a two-step-authentication confirmation stays valid.
   confirm-window-seconds: 5
+  # How the confirmation is asked: chat (click again) or gui (a confirm/cancel menu).
+  confirm-style: chat
 
 stash:
   # Virtual vouchers players claim from a menu with /stash.
   enabled: true
   command-aliases: [ rewards ]
+  title: "<gradient:#FFD700:#FF8A00>Your Stash"
   rows: 6
   notify-on-join: true
   expire-after: ""    # e.g. 30d; blank = never
@@ -155,16 +158,16 @@ cooldowns entirely.
 
 ## stash
 
-The [Stash](/docs/stash) of virtual vouchers players claim with `/stash`. Read at
-startup; changing these needs a restart, except `stash.overflow`, which
-`/voucher reload` applies live.
+The [Stash](/docs/stash) of virtual vouchers players claim with `/stash`.
+`/voucher reload` applies `stash.title`, `stash.rows` and `stash.overflow`; the
+rest are read at startup and need a restart.
 
 | Key | Default | Notes |
 | --- | --- | --- |
 | `stash.enabled` | `true` | Register `/stash` and the join notification. |
 | `stash.command-aliases` | `[ rewards ]` | Extra names for `/stash`. |
 | `stash.title` | gradient | The menu title (MiniMessage). |
-| `stash.rows` | `6` | Menu height, `3` to `6`. |
+| `stash.rows` | `6` | Menu height, `1` to `6`. The menu always has at least 3 rows, so `1` and `2` show as 3. |
 | `stash.notify-on-join` | `true` | Greet a joining player when rewards are waiting. |
 | `stash.expire-after` | `""` | New entries lapse after this (e.g. `30d`); blank never expires. |
 | `stash.overflow` | `drop` | When a give does not fit a player's inventory: `drop` the items, or `stash` them. |
@@ -181,6 +184,20 @@ is in use and how many vouchers are loaded). They never include player data. See
 
 ## Applying changes
 
-`config.yml` is read on startup. After editing it, restart the server for command
-aliases, storage, locale, and redeem settings to take effect. Voucher and code files, and the language
-files in `lang/`, are reloaded live with `/voucher reload`.
+`/voucher reload` re-reads `config.yml`, the voucher and code files and the
+language files in `lang/`. These settings take effect at once:
+
+- `anti-dupe.remove-on-discovery`, `anti-dupe.warning.enabled`,
+  `anti-dupe.warning.text`, `anti-dupe.notify.enabled`
+- `redeem.left-click-preview`, `redeem.batch-open-quiet`,
+  `redeem.confirm-window-seconds`, `redeem.confirm-style`
+- `stash.title`, `stash.rows`, `stash.overflow`
+
+The rest decide what is built while the server starts, so changing them needs a
+restart: `command-aliases`, the `locale` settings, everything under `storage`,
+`stash.enabled`, `stash.command-aliases`, `stash.notify-on-join`,
+`stash.expire-after`, the `cooldown` tiers, whether the `auto-give` section
+exists, and `metrics.enabled`.
+
+The same settings can be edited in a browser: see the
+[Web Config Editor](/docs/comficonf).

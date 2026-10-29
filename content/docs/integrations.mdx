@@ -111,6 +111,18 @@ Region restrictions (claim only in spawn, deny in PvP zones, and so on) work
 through a region hook backed by WorldGuard. Install WorldGuard and gate vouchers
 with `type: region`.
 
+## Editing settings in a browser
+
+ProVouchers registers `config.yml` with [ComfiConf](https://docs.comficonf.com)
+when its bridge plugin is installed, so the server-wide settings can be edited at
+[app.comficonf.com](https://app.comficonf.com) instead of in the file. Most
+changes take effect without a restart, comments and unknown keys in the file are
+kept, and the previous file is backed up on every save.
+
+Install the bridge and pair the server, and ProVouchers appears in the editor by
+itself. Without the bridge, nothing changes. See the
+[Web Config Editor](/docs/comficonf).
+
 ## Everything else
 
 For plugins ProVouchers does not integrate with natively, a `command:` reward
@@ -137,4 +149,5 @@ right tool.
 | Placeholders | PlaceholderAPI, MiniPlaceholders | Works now |
 | Custom items | ItemsAdder, Oraxen, Nexo | Works now |
 | Regions (condition) | WorldGuard | Works now |
+| Editing `config.yml` in a browser | ComfiConf | Works now |
 | Everything else | `command:` reward | Always available |
