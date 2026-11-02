@@ -3,15 +3,17 @@ title: Metrics and Telemetry
 description: What ProVouchers reports, why, and how to opt out.
 ---
 
-ProVouchers submits pseudonymous, aggregate usage statistics through
-[bStats](https://bstats.org) and FastStats. The data helps prioritise which
-platforms, integrations, and features to invest in. It is enabled by default and
-can be turned off with a single setting.
+ProVouchers submits pseudonymous usage statistics through
+[bStats](https://bstats.org) and [FastStats](https://faststats.dev), and error
+reports through FastStats. The data helps prioritise which platforms,
+integrations, and features to invest in, and shows where the plugin is failing.
+It is enabled by default and can be turned off with a single setting.
 
 <Callout>
-Metrics are **aggregate and non-identifying**. No player names, UUIDs, IP
-addresses, voucher contents, or command output ever leave the server. Everything
-below is either a server-wide count or a coarse category.
+Usage statistics are **server-wide counts and coarse categories**. They contain
+no player names, UUIDs, voucher names or contents, or command output. They are
+pseudonymous rather than anonymous, because each service ties them to a randomly
+generated server ID. [Error reports](#error-reports) work differently.
 </Callout>
 
 ## Opting out
@@ -23,13 +25,35 @@ metrics:
   enabled: false
 ```
 
-This disables every chart and both providers at once.
+This turns off every chart, error reports, and both providers at once.
+
+Each service also has its own switch. These apply to every plugin on the server
+that uses that service:
+
+| File | Setting | Effect |
+| --- | --- | --- |
+| `plugins/bStats/config.yml` | `enabled: false` | Turns off bStats. |
+| `plugins/faststats/config.properties` | `enabled=false` | Turns off FastStats. |
+| `plugins/faststats/config.properties` | `submitMetrics=false` | Turns off FastStats statistics only. |
+| `plugins/faststats/config.properties` | `submitErrors=false` | Turns off error reports only. |
 
 ## What is collected
 
-The same definitions are reported to bStats and FastStats. Charts fall into two
-groups: a snapshot of how the plugin is configured, and counts of activity since
-the server started.
+The same chart definitions are reported to bStats and FastStats. Both services
+also collect details about the server by themselves.
+
+### Server details
+
+Sent with every submission:
+
+- A randomly generated server ID
+- Player count and online mode
+- Server software and version, and the plugin version
+- Java version, and for FastStats the Java vendor
+- Operating system name, version, and architecture
+- CPU core count
+
+Both services also record the server's approximate country.
 
 ### Environment and configuration
 
@@ -49,6 +73,11 @@ Read from the loaded configuration on each submission.
 | `uses_cooldowns` | Whether any voucher sets a cooldown. |
 | `uses_expiry` | Whether any voucher or code sets an expiry. |
 | `uses_conditions` | Whether any voucher or code gates on conditions. |
+| `uses_soulbound` | Whether any voucher is soulbound. |
+| `uses_two_step` | Whether any voucher asks for two-step confirmation. |
+| `uses_batch_open` | Whether any voucher can be opened as a stack. |
+| `stash_overflow` | Whether a give that does not fit is dropped or stashed. |
+| `uses_stash_expiry` | Whether Stash entries are set to expire. |
 
 ### Activity
 
@@ -63,14 +92,38 @@ anything about *who* redeemed *what*.
 | `dupes_blocked` | Duplicate voucher items rejected by anti-dupe. |
 | `condition_denials` | Redemptions blocked because a condition failed. |
 | `top_reward_granted` | The reward type granted most often. |
+| `stashed` | Entries added to the Stash. |
+| `stash_claims` | Entries claimed from the Stash. |
+| `stash_expired` | Entries that expired unclaimed. |
+
+## Error reports
+
+When ProVouchers hits an error, FastStats receives a report holding the error
+type, its message, its stack trace, and whether it was handled, along with the
+server details and chart values above. bStats receives no error reports.
+
+Before a report leaves the server, its messages are filtered to remove:
+
+- IP addresses, email addresses, and UUIDs
+- Bearer tokens, AWS keys, Discord webhook tokens, and API keys or secrets in URLs
+- Database URLs and SQL statements
+- Local usernames and Windows file paths
+
+The filter matches patterns, so a message could still contain something it does
+not recognise, such as a player name or a voucher id.
 
 ## Where the data goes
 
 - **bStats** publishes a public page per plugin, with the charts above rendered as
-  graphs.
-- **FastStats** receives the same definitions.
+  graphs. It receives the server's IP address with each submission for rate limiting
+  and says it keeps it for up to 60 minutes. See its
+  [privacy policy](https://bstats.org/privacy-policy).
+- **FastStats** receives the same charts, plus error reports. It says requests are
+  proxied and that it never receives or stores the server's IP address. See its
+  [data overview](https://faststats.dev/info) and
+  [privacy policy](https://faststats.dev/privacy).
 
-Each chart is defined once and reported to both backends, and the single
+Each chart is defined once and reported to both services, and the single
 `metrics.enabled` switch governs both.
 
 ## Checking it works
@@ -78,7 +131,7 @@ Each chart is defined once and reported to both backends, and the single
 Run `/voucher doctor`. Its `Metrics` line reports what each backend is doing:
 
 ```text
-Metrics: bStats on, FastStats bukkit 0.30.2 on (errors on)
+Metrics: bStats on, FastStats bukkit 0.31.0 on (errors on)
 ```
 
 | Reads | Meaning |
@@ -86,13 +139,13 @@ Metrics: bStats on, FastStats bukkit 0.30.2 on (errors on)
 | `off (metrics.enabled: false)` | Turned off in `config.yml`. Nothing is collected. |
 | `not started` | Metrics are on, but no backend started. The console logs why at startup. |
 | `bStats not started` | bStats failed to start, usually no network at startup. |
-| `FastStats opted out on this server` | Opted out in `config/faststats/config.properties`, or started with `-Dfaststats.enabled=false`. |
+| `FastStats opted out on this server` | Opted out in `plugins/faststats/config.properties`, or started with `-Dfaststats.enabled=false`. |
 | `FastStats not submitting metrics` | FastStats runs but its metrics submission is off in that file. |
 | `(errors off)` | Error reports are not sent, either by that file or because the service did not start. |
 
 <Callout>
 FastStats submits nothing on a brand new server: the first start writes
-`config/faststats/config.properties`, and submission begins on the next start. A
+`plugins/faststats/config.properties`, and submission begins after a restart. A
 first run showing `on` is normal and correct.
 </Callout>
 
